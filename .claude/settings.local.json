@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx:*)",
+      "Bash(cp -r /Users/neilreeve-newson/Desktop/michef-temp/. /Users/neilreeve-newson/Desktop/MiChef/)",
+      "Bash(rm -rf /Users/neilreeve-newson/Desktop/michef-temp)",
+      "Bash(cat /Users/neilreeve-newson/Desktop/MiChef/node_modules/next/dist/docs/*.md)"
+    ]
+  }
+}
