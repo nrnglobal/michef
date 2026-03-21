@@ -128,3 +128,14 @@
     @apply font-sans;
   }
 }
+
+/* Casa Cook Brand Variables */
+:root {
+  --casa-primary: #8B6914;
+  --casa-bg: #FAFAF8;
+  --casa-surface: #FFFFFF;
+  --casa-border: #E8E0D0;
+  --casa-text: #1A1410;
+  --casa-text-muted: #6B5B3E;
+  --casa-text-faint: #9B8B70;
+}

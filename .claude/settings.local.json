@@ -4,7 +4,17 @@
       "Bash(npx:*)",
       "Bash(cp -r /Users/neilreeve-newson/Desktop/michef-temp/. /Users/neilreeve-newson/Desktop/MiChef/)",
       "Bash(rm -rf /Users/neilreeve-newson/Desktop/michef-temp)",
-      "Bash(cat /Users/neilreeve-newson/Desktop/MiChef/node_modules/next/dist/docs/*.md)"
+      "Bash(cat /Users/neilreeve-newson/Desktop/MiChef/node_modules/next/dist/docs/*.md)",
+      "Bash(npm install:*)",
+      "Bash(ls:*)",
+      "Bash(/Users/neilreeve-newson/Desktop/MiChef/node_modules/typescript/bin/tsc --noEmit)",
+      "Bash(/Users/neilreeve-newson/Desktop/MiChef/node_modules/typescript/bin/tsc --version 2>&1)",
+      "Bash(node /Users/neilreeve-newson/Desktop/MiChef/node_modules/typescript/bin/tsc --noEmit)",
+      "Bash(npm run:*)",
+      "Bash(node /Users/neilreeve-newson/Desktop/MiChef/node_modules/next/dist/bin/next build)",
+      "Bash(git -C /Users/neilreeve-newson/Desktop/MiChef init)",
+      "Bash(git -C /Users/neilreeve-newson/Desktop/MiChef add -A)",
+      "Bash(git -C /Users/neilreeve-newson/Desktop/MiChef commit -m \"feat\\(phase1\\): complete Casa Cook Phase 1 implementation:*)"
     ]
   }
 }
