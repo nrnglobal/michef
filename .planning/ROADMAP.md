@@ -41,7 +41,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Rules engine surfaces warnings for frequency, exclusion, and substitution violations before the client confirms
   4. Confirming a menu auto-generates a shopping list with ingredients merged, units normalised, and grouped by category, plus fridge staples appended
   5. Cook sees the next confirmed visit with recipes in Spanish and can check off shopping list items with large touch targets, running count, and visual de-emphasis of checked items
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Infrastructure fixes (proxy routes, RLS tightening, env fallback) + navigation + i18n
+- [ ] 02-02-PLAN.md — Menu planning Server Actions, business logic, pages, recipe picker, AI suggest route
+- [ ] 02-03-PLAN.md — Cook shopping list page + visita page update
+- [ ] 02-04-PLAN.md — Full flow human verification checkpoint
 
 ### Phase 3: AI Features
 **Goal**: The client can generate new recipes, adjust existing ones with AI-produced diffs, import recipes from URLs, and the cook can upload receipts for automated extraction
@@ -83,7 +89,7 @@ Phases execute in numeric order: 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | - | Complete | 2026-03-22 |
-| 2. Menu Planning and Shopping | 0/TBD | Not started | - |
+| 2. Menu Planning and Shopping | 0/4 | Planned | - |
 | 3. AI Features | 0/TBD | Not started | - |
 | 4. Communication and Finance | 0/TBD | Not started | - |
 | 5. Polish | 0/TBD | Not started | - |
