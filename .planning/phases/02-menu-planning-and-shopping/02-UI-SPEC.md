@@ -58,12 +58,12 @@ Source: 8-point scale (default) + REQUIREMENTS.md SHOP-03.
 | Role | Size | Weight | Line Height | Usage |
 |------|------|--------|-------------|-------|
 | Body | 14px (text-sm) | 400 (regular) | 1.5 | List item names, card body text, form labels |
-| Label | 12px (text-xs) | 500 (medium) | 1.4 | Section labels, category badges, stat captions, running count |
+| Label | 12px (text-xs) | 400 (regular) | 1.4 | Section labels, category badges, stat captions, running count |
 | Heading | 20px (text-xl) | 600 (semibold) | 1.2 | Page titles, modal headings |
 | Display | 24px (text-2xl) | 600 (semibold) | 1.2 | Client dashboard page title only |
 
 Notes:
-- Two weights only: 400 (regular) and 600 (semibold). No bold (700) to maintain the restrained brand tone.
+- Two weights only: 400 (regular) and 600 (semibold). No medium (500) or bold (700) to maintain the restrained brand tone.
 - Spanish text for the cook uses identical sizing — the i18n layer substitutes strings, typography contract is language-agnostic.
 - Established by existing code: `text-2xl font-semibold` for page H1, `text-sm` for body — confirmed in `dashboard/page.tsx` and `recipes/page.tsx`.
 
@@ -127,6 +127,7 @@ Source: `app/globals.css` Casa Cook brand variables + existing component pattern
 #### Menu plan create/edit page (`/menus/[id]`)
 - Full page (not drawer — confirmed by D-01).
 - Sections in order: date input, recipe slots (2–4), rules warnings panel, action bar.
+- **Focal point:** The recipe slots region is the primary focal point of this page. It occupies the largest visual area, sits centrally, and is the user's main task area. The "Add recipe" and "Suggest menu" buttons directly below the slots anchor attention there. The "Confirm menu" action bar is visually distinct at the bottom to signal task completion, but the recipe slots receive the eye first.
 - Date input: plain `<input type="date">` via shadcn `Input` component. No calendar widget (D-03).
 - Recipe slots: ordered list of selected recipes; each slot has a remove button (×, 20px, `#9B8B70`).
 - "Add recipe" button: secondary style (outline, `#8B6914` border and text), opens picker modal.
@@ -139,7 +140,7 @@ Source: `app/globals.css` Casa Cook brand variables + existing component pattern
 - Interior replicates `recipes/page.tsx` pattern: search `Input` + category `Tabs` + grid.
 - Selection: tap/click toggles selection; selected recipes show checkmark badge overlay on card top-right corner.
 - Counter in modal header: "3 of 4 selected" (amber text when at limit).
-- "Done" button: disabled until 2+ recipes selected; enabled at 2–4; `#8B6914` fill when enabled.
+- "Confirm selection" button: disabled until 2+ recipes selected; enabled at 2–4; `#8B6914` fill when enabled.
 - Loading skeleton: 6 × `h-24 rounded-xl animate-pulse` in `#E8E0D0`.
 
 #### AI suggest menu loading state
@@ -175,7 +176,7 @@ All copy below is bilingual. English = client interface. Spanish = cook interfac
 | Primary CTA (confirm plan) | "Confirm menu" | — |
 | Primary CTA (AI suggest) | "Suggest menu" | — |
 | Primary CTA (shopping list done) | — | "Listo" (not a button; count indicator) |
-| Modal confirm button | "Done" | — |
+| Modal confirm button | "Confirm selection" | — |
 | Running count | "{n} of {total} checked" | "{n} de {total} listos" |
 | Empty state — no plans | "No upcoming menus planned" | — |
 | Empty state — no plans body | "Plan your next visit to get started." | — |
@@ -184,7 +185,7 @@ All copy below is bilingual. English = client interface. Spanish = cook interfac
 | Empty state — shopping list body | — | "Aún no hay ingredientes asignados." |
 | Rules warning heading | "Cooking rules warning" | — |
 | Rules warning body | "{rule description}. Review before confirming." | — |
-| Destructive: remove recipe from plan | "Remove" (icon button, no confirmation — low stakes, editable state) | — |
+| Destructive: remove recipe from plan | "Remove recipe" (icon button, no confirmation — low stakes, editable state) | — |
 | Destructive: delete plan | "Delete plan" — confirm via Dialog: "This will delete the plan for {date}. This cannot be undone." / "Delete" (destructive) / "Cancel" | — |
 | Error: save failed | "Couldn't save your changes. Try again." | — |
 | Error: AI suggest failed | "Couldn't generate suggestions. Try again." | — |
@@ -229,6 +230,7 @@ All copy below is bilingual. English = client interface. Spanish = cook interfac
 - Rules warnings: `role="alert"` on warning panel when violations are present.
 - Running count: `aria-live="polite"` so screen readers announce changes when items are checked.
 - Touch targets: all interactive elements in cook shopping list meet 48px minimum (SHOP-03).
+- Floating add-item button: `aria-label="Add item to shopping list"` — required because the button renders a "+" icon with no visible text label.
 
 ---
 
