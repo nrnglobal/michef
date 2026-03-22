@@ -47,7 +47,6 @@ Declared values (must be multiples of 4):
 
 Exceptions:
 - Shopping list check-off touch targets: minimum 48px height (SHOP-03 requirement). Use `min-h-12` (48px) on each list item row.
-- Bottom navigation safe area on cook mobile: `pb-20` (80px) — already established in `(cook)/layout.tsx`.
 
 Source: 8-point scale (default) + REQUIREMENTS.md SHOP-03.
 
@@ -186,7 +185,7 @@ All copy below is bilingual. English = client interface. Spanish = cook interfac
 | Rules warning heading | "Cooking rules warning" | — |
 | Rules warning body | "{rule description}. Review before confirming." | — |
 | Destructive: remove recipe from plan | "Remove recipe" (icon button, no confirmation — low stakes, editable state) | — |
-| Destructive: delete plan | "Delete plan" — confirm via Dialog: "This will delete the plan for {date}. This cannot be undone." / "Delete" (destructive) / "Cancel" | — |
+| Destructive: delete plan | "Delete plan" — confirm via Dialog: "This will delete the plan for {date}. This cannot be undone." / "Delete plan" (destructive) / "Cancel" | — |
 | Error: save failed | "Couldn't save your changes. Try again." | — |
 | Error: AI suggest failed | "Couldn't generate suggestions. Try again." | — |
 | Error: shopping list generation failed | "Couldn't create the shopping list. Confirm the menu again to retry." | — |
@@ -218,7 +217,7 @@ All copy below is bilingual. English = client interface. Spanish = cook interfac
 
 ### Cook layout (reuse established)
 - Mobile-first single column: `max-w-lg mx-auto px-4 py-6`.
-- Bottom nav already provides `pb-20` safe area.
+- Bottom nav safe area: inherits `pb-20` from existing `(cook)/layout.tsx` — not a new spacing token, do not redeclare.
 - Shopping list: single column, full-width list items.
 
 ---
@@ -231,6 +230,7 @@ All copy below is bilingual. English = client interface. Spanish = cook interfac
 - Running count: `aria-live="polite"` so screen readers announce changes when items are checked.
 - Touch targets: all interactive elements in cook shopping list meet 48px minimum (SHOP-03).
 - Floating add-item button: `aria-label="Add item to shopping list"` — required because the button renders a "+" icon with no visible text label.
+- Recipe slot remove button (×): `aria-label="Remove {recipe name}"` — required because the button renders an icon-only × with no visible text label.
 
 ---
 
