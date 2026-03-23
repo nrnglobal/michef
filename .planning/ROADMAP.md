@@ -13,7 +13,7 @@ Phase 1 established the foundation: Next.js 16 + Supabase auth, role-based routi
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Auth, role routing, bilingual data model, recipe library (complete)
-- [ ] **Phase 2: Menu Planning and Shopping** - Core workflow: menu creation, AI suggestions, rules validation, shopping list, cook's mobile check-off view
+- [x] **Phase 2: Menu Planning and Shopping** - Core workflow: menu creation, AI suggestions, rules validation, shopping list, cook's mobile check-off view (completed 2026-03-23)
 - [ ] **Phase 3: AI Features** - Claude API layer: recipe generation, feedback-driven adjustment with diff view, receipt OCR, recipe import from URL
 - [ ] **Phase 4: Communication and Finance** - Real-time bilingual messaging, per-visit payment records, monthly spending summary
 - [ ] **Phase 5: Polish** - Offline shopping list, export, spending analytics
@@ -47,7 +47,7 @@ Plans:
 - [x] 02-01-PLAN.md — Infrastructure fixes (proxy routes, RLS tightening, env fallback) + navigation + i18n
 - [x] 02-02-PLAN.md — Menu planning Server Actions, business logic, pages, recipe picker, AI suggest route
 - [x] 02-03-PLAN.md — Cook shopping list page + visita page update
-- [ ] 02-04-PLAN.md — Full flow human verification checkpoint
+- [x] 02-04-PLAN.md — Full flow human verification checkpoint
 
 ### Phase 3: AI Features
 **Goal**: The client can generate new recipes, adjust existing ones with AI-produced diffs, import recipes from URLs, and the cook can upload receipts for automated extraction
@@ -89,7 +89,7 @@ Phases execute in numeric order: 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | - | Complete | 2026-03-22 |
-| 2. Menu Planning and Shopping | 3/4 | In Progress|  |
+| 2. Menu Planning and Shopping | 4/4 | Complete   | 2026-03-23 |
 | 3. AI Features | 0/TBD | Not started | - |
 | 4. Communication and Finance | 0/TBD | Not started | - |
 | 5. Polish | 0/TBD | Not started | - |
