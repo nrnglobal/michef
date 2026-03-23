@@ -46,7 +46,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 - [x] 02-01-PLAN.md — Infrastructure fixes (proxy routes, RLS tightening, env fallback) + navigation + i18n
 - [x] 02-02-PLAN.md — Menu planning Server Actions, business logic, pages, recipe picker, AI suggest route
-- [ ] 02-03-PLAN.md — Cook shopping list page + visita page update
+- [x] 02-03-PLAN.md — Cook shopping list page + visita page update
 - [ ] 02-04-PLAN.md — Full flow human verification checkpoint
 
 ### Phase 3: AI Features
@@ -89,7 +89,7 @@ Phases execute in numeric order: 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | - | Complete | 2026-03-22 |
-| 2. Menu Planning and Shopping | 2/4 | In Progress|  |
+| 2. Menu Planning and Shopping | 3/4 | In Progress|  |
 | 3. AI Features | 0/TBD | Not started | - |
 | 4. Communication and Finance | 0/TBD | Not started | - |
 | 5. Polish | 0/TBD | Not started | - |

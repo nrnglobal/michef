@@ -18,17 +18,17 @@
 - [x] **MENU-03**: Client can confirm a menu plan, making it visible to the cook
 - [x] **MENU-04**: Client can request an AI-suggested menu that respects active cooking rules, avoids recently cooked recipes, and incorporates recent feedback
 - [x] **MENU-05**: Rules engine validates a menu plan and surfaces warnings (frequency violations, exclusion matches, substitution suggestions) before confirmation
-- [ ] **MENU-06**: Cook can see the next confirmed visit with its assigned recipes in Spanish
+- [x] **MENU-06**: Cook can see the next confirmed visit with its assigned recipes in Spanish
 
 ### Shopping List
 
 - [x] **SHOP-01**: Confirmed menu plan auto-generates a consolidated shopping list (ingredients from all recipes merged by item, units normalised, grouped by category)
-- [ ] **SHOP-02**: Cook can view shopping list items in Spanish with quantity and unit
-- [ ] **SHOP-03**: Cook can check off individual items on the shopping list (large touch targets, min 48px)
-- [ ] **SHOP-04**: Shopping list shows a running count of checked vs total items
-- [ ] **SHOP-05**: Checked items visually de-emphasise (grey out or move to bottom)
-- [ ] **SHOP-06**: Shopping list includes a fridge staples section at the bottom (from `fridge_staples` table), separate from recipe ingredients
-- [ ] **SHOP-07**: Cook can add ad-hoc items to the shopping list during shopping
+- [x] **SHOP-02**: Cook can view shopping list items in Spanish with quantity and unit
+- [x] **SHOP-03**: Cook can check off individual items on the shopping list (large touch targets, min 48px)
+- [x] **SHOP-04**: Shopping list shows a running count of checked vs total items
+- [x] **SHOP-05**: Checked items visually de-emphasise (grey out or move to bottom)
+- [x] **SHOP-06**: Shopping list includes a fridge staples section at the bottom (from `fridge_staples` table), separate from recipe ingredients
+- [x] **SHOP-07**: Cook can add ad-hoc items to the shopping list during shopping
 
 ### AI — Recipe
 
@@ -110,14 +110,14 @@
 | MENU-03 | Phase 2 | Complete |
 | MENU-04 | Phase 2 | Complete |
 | MENU-05 | Phase 2 | Complete |
-| MENU-06 | Phase 2 | Pending |
+| MENU-06 | Phase 2 | Complete |
 | SHOP-01 | Phase 2 | Complete |
-| SHOP-02 | Phase 2 | Pending |
-| SHOP-03 | Phase 2 | Pending |
-| SHOP-04 | Phase 2 | Pending |
-| SHOP-05 | Phase 2 | Pending |
-| SHOP-06 | Phase 2 | Pending |
-| SHOP-07 | Phase 2 | Pending |
+| SHOP-02 | Phase 2 | Complete |
+| SHOP-03 | Phase 2 | Complete |
+| SHOP-04 | Phase 2 | Complete |
+| SHOP-05 | Phase 2 | Complete |
+| SHOP-06 | Phase 2 | Complete |
+| SHOP-07 | Phase 2 | Complete |
 | AIREC-01 | Phase 3 | Pending |
 | AIREC-02 | Phase 3 | Pending |
 | AIREC-03 | Phase 3 | Pending |
