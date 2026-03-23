@@ -99,7 +99,8 @@ Return JSON only, no markdown. Format:
 
     const data = await response.json()
     const text = data.content?.[0]?.text ?? ''
-    const parsed = JSON.parse(text)
+    const clean = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim()
+    const parsed = JSON.parse(clean)
 
     return Response.json(parsed)
   } catch {
