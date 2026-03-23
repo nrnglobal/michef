@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
-import { CalendarDays, ChefHat } from 'lucide-react'
+import Link from 'next/link'
+import { CalendarDays, ChefHat, ShoppingCart } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { formatDateEs } from '@/lib/utils'
@@ -39,28 +40,44 @@ export default async function VisitaPage() {
       .single()
 
     menuPlan = planData as MenuPlan | null
+  }
 
-    if (menuPlan) {
-      const { data: items } = await supabase
-        .from('menu_plan_items')
-        .select('recipe_id, sort_order')
-        .eq('menu_plan_id', menuPlan.id)
-        .order('sort_order', { ascending: true })
+  // Fallback: if no visit or no menu_plan_id, check for a confirmed menu plan directly
+  if (!menuPlan) {
+    const { data: directPlan } = await supabase
+      .from('menu_plans')
+      .select('*')
+      .eq('status', 'confirmed')
+      .gte('visit_date', new Date().toISOString().split('T')[0])
+      .order('visit_date', { ascending: true })
+      .limit(1)
+      .single()
 
-      if (items && items.length > 0) {
-        const recipeIds = items.map((i) => i.recipe_id)
-        const { data: recipes } = await supabase
-          .from('recipes')
-          .select('*')
-          .in('id', recipeIds)
+    if (directPlan) {
+      menuPlan = directPlan as MenuPlan
+    }
+  }
 
-        // Sort recipes according to menu plan order
-        if (recipes) {
-          const recipeMap = new Map(recipes.map((r) => [r.id, r]))
-          menuRecipes = items
-            .map((i) => recipeMap.get(i.recipe_id))
-            .filter(Boolean) as Recipe[]
-        }
+  if (menuPlan) {
+    const { data: items } = await supabase
+      .from('menu_plan_items')
+      .select('recipe_id, sort_order')
+      .eq('menu_plan_id', menuPlan.id)
+      .order('sort_order', { ascending: true })
+
+    if (items && items.length > 0) {
+      const recipeIds = items.map((i) => i.recipe_id)
+      const { data: recipes } = await supabase
+        .from('recipes')
+        .select('*')
+        .in('id', recipeIds)
+
+      // Sort recipes according to menu plan order
+      if (recipes) {
+        const recipeMap = new Map(recipes.map((r) => [r.id, r]))
+        menuRecipes = items
+          .map((i) => recipeMap.get(i.recipe_id))
+          .filter(Boolean) as Recipe[]
       }
     }
   }
@@ -188,6 +205,22 @@ export default async function VisitaPage() {
               </div>
             )}
           </div>
+
+          {/* Shopping list link */}
+          {menuPlan?.status === 'confirmed' && menuRecipes.length > 0 && (
+            <Link
+              href="/lista"
+              className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border text-sm font-semibold transition-colors hover:opacity-90"
+              style={{
+                color: '#8B6914',
+                borderColor: '#8B6914',
+                backgroundColor: 'transparent',
+              }}
+            >
+              <ShoppingCart className="w-4 h-4" />
+              Lista de compras
+            </Link>
+          )}
 
           {/* Payment info */}
           {(visit.grocery_total || visit.service_fee || visit.total_payment) && (
