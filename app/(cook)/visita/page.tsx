@@ -155,43 +155,39 @@ export default async function VisitaPage() {
             {menuRecipes.length > 0 ? (
               <div className="space-y-3">
                 {menuRecipes.map((recipe, idx) => (
-                  <Card
-                    key={recipe.id}
-                    style={{ border: '1px solid #E8E0D0', backgroundColor: '#FFFFFF' }}
-                  >
-                    <CardContent className="pt-4 pb-4">
-                      <div className="flex items-start gap-3">
-                        <div
-                          className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-sm font-bold"
-                          style={{
-                            backgroundColor: '#FEF9EC',
-                            color: '#8B6914',
-                          }}
-                        >
-                          {idx + 1}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-sm" style={{ color: '#1A1410' }}>
-                            {recipe.title_es}
-                          </p>
-                          <p className="text-xs mt-0.5" style={{ color: '#9B8B70' }}>
-                            {recipe.title_en}
-                          </p>
-                          {recipe.prep_time_minutes && (
-                            <p className="text-xs mt-1" style={{ color: '#9B8B70' }}>
-                              {recipe.prep_time_minutes} min
+                  <Link key={recipe.id} href={`/recetas/${recipe.id}`} className="block">
+                    <Card style={{ border: '1px solid #E8E0D0', backgroundColor: '#FFFFFF' }}>
+                      <CardContent className="pt-4 pb-4">
+                        <div className="flex items-start gap-3">
+                          <div
+                            className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-sm font-bold"
+                            style={{ backgroundColor: '#FEF9EC', color: '#8B6914' }}
+                          >
+                            {idx + 1}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-sm" style={{ color: '#1A1410' }}>
+                              {recipe.title_es}
                             </p>
-                          )}
+                            <p className="text-xs mt-0.5" style={{ color: '#9B8B70' }}>
+                              {recipe.title_en}
+                            </p>
+                            {recipe.prep_time_minutes && (
+                              <p className="text-xs mt-1" style={{ color: '#9B8B70' }}>
+                                {recipe.prep_time_minutes} min
+                              </p>
+                            )}
+                          </div>
+                          <span
+                            className="text-xs font-medium px-2 py-0.5 rounded-full capitalize shrink-0"
+                            style={{ backgroundColor: '#F0EBE0', color: '#6B5B3E' }}
+                          >
+                            {recipe.category}
+                          </span>
                         </div>
-                        <span
-                          className="text-xs font-medium px-2 py-0.5 rounded-full capitalize shrink-0"
-                          style={{ backgroundColor: '#F0EBE0', color: '#6B5B3E' }}
-                        >
-                          {recipe.category}
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))}
               </div>
             ) : (
