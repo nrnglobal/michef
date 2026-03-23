@@ -5,9 +5,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+function parseDateLocal(date: string | Date): Date {
+  if (typeof date !== 'string') return date
+  const [y, m, day] = date.split('-').map(Number)
+  return new Date(y, m - 1, day)
+}
+
 export function formatDate(date: string | Date): string {
-  const d = typeof date === 'string' ? new Date(date) : date
-  return d.toLocaleDateString('en-US', {
+  return parseDateLocal(date).toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -16,8 +21,7 @@ export function formatDate(date: string | Date): string {
 }
 
 export function formatDateEs(date: string | Date): string {
-  const d = typeof date === 'string' ? new Date(date) : date
-  return d.toLocaleDateString('es-ES', {
+  return parseDateLocal(date).toLocaleDateString('es-ES', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',

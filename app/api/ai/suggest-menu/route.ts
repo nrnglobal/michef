@@ -67,7 +67,7 @@ Return JSON only, no markdown. Format:
 }`
 
   // 5. Call Claude API
-  const apiKey = process.env.CLAUDE_API_KEY
+  const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) {
     return Response.json(
       { error: 'Claude API key not configured' },

@@ -93,14 +93,6 @@ export async function confirmMenuPlan(planId: string) {
 
   if (recipesError) throw new Error(recipesError.message)
 
-  // Fetch active fridge staples
-  const { data: staples, error: staplesError } = await supabase
-    .from('fridge_staples')
-    .select('*')
-    .eq('is_active', true)
-
-  if (staplesError) throw new Error(staplesError.message)
-
   // Consolidate ingredients
   const typedRecipes = (recipes ?? []).map((r: { id: string; ingredients: Ingredient[] }) => ({
     id: r.id,
@@ -148,43 +140,34 @@ export async function confirmMenuPlan(planId: string) {
     is_always_stock: false,
   }))
 
-  // Insert fridge staple items
-  const stapleItems = (staples ?? []).map(
-    (s: {
-      item_name_en: string
-      item_name_es: string
-      category?: string
-    }) => ({
-      shopping_list_id: list.id,
-      ingredient_name_en: s.item_name_en,
-      ingredient_name_es: s.item_name_es,
-      quantity: null,
-      unit: null,
-      category: s.category ?? 'Staples',
-      source_recipe_ids: [],
-      is_checked: false,
-      is_always_stock: true,
-    })
-  )
-
-  const allItems = [...ingredientItems, ...stapleItems]
-  if (allItems.length > 0) {
+  if (ingredientItems.length > 0) {
     const { error: insertError } = await supabase
       .from('shopping_list_items')
-      .insert(allItems)
+      .insert(ingredientItems)
     if (insertError) throw new Error(insertError.message)
   }
 
   // Update plan status to confirmed
-  const { error: updateError } = await supabase
+  const { data: planRow, error: updateError } = await supabase
     .from('menu_plans')
     .update({ status: 'confirmed' })
     .eq('id', planId)
+    .select('visit_date')
+    .single()
 
   if (updateError) throw new Error(updateError.message)
 
+  // Create visits row so cook can see upcoming visit (delete-first for re-confirm)
+  if (planRow) {
+    await supabase.from('visits').delete().eq('menu_plan_id', planId)
+    await supabase
+      .from('visits')
+      .insert({ visit_date: planRow.visit_date, menu_plan_id: planId })
+  }
+
   revalidatePath('/menus')
   revalidatePath('/menus/' + planId)
+  revalidatePath('/visita')
 }
 
 export async function deleteMenuPlan(planId: string) {

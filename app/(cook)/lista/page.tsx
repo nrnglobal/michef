@@ -145,8 +145,6 @@ export default function ListaPage() {
     )
   }
 
-  const recipeItems = items.filter(i => !i.is_always_stock)
-  const fridgeItems = items.filter(i => i.is_always_stock)
   const checkedCount = items.filter(i => i.is_checked).length
 
   if (items.length === 0 && !listId) {
@@ -165,8 +163,8 @@ export default function ListaPage() {
     )
   }
 
-  // Group recipe items by category
-  const categoryGroups = recipeItems.reduce<Record<string, ShoppingListItem[]>>((acc, item) => {
+  // Group items by category
+  const categoryGroups = items.reduce<Record<string, ShoppingListItem[]>>((acc, item) => {
     const cat = item.category ?? 'Other'
     if (!acc[cat]) acc[cat] = []
     acc[cat].push(item)
@@ -261,52 +259,6 @@ export default function ListaPage() {
           </ul>
         </div>
       ))}
-
-      {/* Fridge staples section */}
-      {fridgeItems.length > 0 && (
-        <div>
-          <Separator className="my-2" />
-          <p
-            className="text-xs uppercase tracking-wide font-medium py-2 border-b"
-            style={{ color: '#9B8B70', borderColor: '#E8E0D0' }}
-          >
-            {t('shopping.fridgeStaples')}
-          </p>
-          <ul>
-            {fridgeItems.map(item => (
-              <li
-                key={item.id}
-                className="flex items-center gap-3 px-1 min-h-12 transition-opacity"
-                style={{ opacity: item.is_checked ? 0.5 : 1 }}
-              >
-                <Checkbox
-                  checked={item.is_checked}
-                  onCheckedChange={(checked: boolean) => handleCheck(item.id, checked)}
-                  aria-label={`${item.ingredient_name_es}${item.quantity ? `, ${item.quantity}` : ''}${item.unit ? ` ${item.unit}` : ''}`}
-                  className="w-6 h-6 shrink-0"
-                  style={{ accentColor: '#8B6914' } as React.CSSProperties}
-                />
-                <div className="flex-1 min-w-0">
-                  <p
-                    className="text-sm"
-                    style={{ color: item.is_checked ? '#9B8B70' : '#1A1410' }}
-                  >
-                    {item.ingredient_name_es}
-                  </p>
-                  <p className="text-xs" style={{ color: '#C4B49A' }}>
-                    {t('shopping.fridgeStaples')}
-                  </p>
-                  {(item.quantity || item.unit) && (
-                    <p className="text-xs" style={{ color: '#9B8B70' }}>
-                      {item.quantity ? `${item.quantity} ` : ''}{item.unit ?? ''}
-                    </p>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       {/* Empty state when list exists but no items */}
       {items.length === 0 && listId && (
