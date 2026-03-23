@@ -3,16 +3,19 @@ import Link from 'next/link'
 import { CalendarDays, BookOpen, Settings, ArrowRight } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { formatDate } from '@/lib/utils'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
+  const today = new Date().toISOString().split('T')[0]
 
   const [
     { data: profile },
     { data: recipes, count: recipeCount },
     { data: rules },
     { data: visits },
+    { data: confirmedPlans },
   ] = await Promise.all([
     supabase
       .from('profiles')
@@ -32,7 +35,14 @@ export default async function DashboardPage() {
     supabase
       .from('visits')
       .select('*')
-      .gte('visit_date', new Date().toISOString().split('T')[0])
+      .gte('visit_date', today)
+      .order('visit_date', { ascending: true })
+      .limit(1),
+    supabase
+      .from('menu_plans')
+      .select('id, visit_date, menu_plan_items(recipe_id, recipes(title_en))')
+      .eq('status', 'confirmed')
+      .gte('visit_date', today)
       .order('visit_date', { ascending: true })
       .limit(1),
   ])
@@ -42,6 +52,11 @@ export default async function DashboardPage() {
   const totalRecipes = recipeCount ?? 0
   const recentRecipes = recipes ?? []
   const userName = profile?.name ?? 'there'
+  const nextConfirmedPlan = confirmedPlans?.[0] as {
+    id: string
+    visit_date: string
+    menu_plan_items: { recipe_id: string; recipes: { title_en: string } | null }[]
+  } | undefined
 
   return (
     <div className="space-y-8">
@@ -155,6 +170,58 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Menu Plan CTA */}
+      <Card style={{ border: '1px solid #E8E0D0', backgroundColor: '#FFFFFF' }}>
+        <CardHeader>
+          <CardTitle className="text-base font-semibold" style={{ color: '#1A1410' }}>
+            Menu Plan
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {nextConfirmedPlan ? (
+            <div className="space-y-3">
+              <p className="text-sm" style={{ color: '#6B5B3E' }}>
+                {formatDate(nextConfirmedPlan.visit_date)}
+              </p>
+              {nextConfirmedPlan.menu_plan_items.length > 0 && (
+                <ul className="space-y-1">
+                  {nextConfirmedPlan.menu_plan_items.slice(0, 4).map((item, i) => (
+                    <li key={i} className="text-sm" style={{ color: '#1A1410' }}>
+                      {item.recipes?.title_en ?? '—'}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <Link href={`/menus/${nextConfirmedPlan.id}`}>
+                <Button
+                  variant="outline"
+                  className="gap-1.5"
+                  style={{ borderColor: '#8B6914', color: '#8B6914' }}
+                >
+                  <CalendarDays className="w-4 h-4" />
+                  View plan
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between">
+              <p className="text-sm" style={{ color: '#6B5B3E' }}>
+                No menu planned yet
+              </p>
+              <Link href="/menus">
+                <Button
+                  className="gap-1.5"
+                  style={{ backgroundColor: '#8B6914', color: '#FFFFFF' }}
+                >
+                  <CalendarDays className="w-4 h-4" />
+                  Plan menu
+                </Button>
+              </Link>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Recent Recipes */}
       <div>
