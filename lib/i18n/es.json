@@ -132,5 +132,50 @@
     "back": "Volver",
     "english": "Inglés",
     "spanish": "Español"
+  },
+  "menu": {
+    "title": "Planes de Menu",
+    "planMenu": "Planificar menu",
+    "confirmMenu": "Confirmar menu",
+    "confirming": "Confirmando...",
+    "suggestMenu": "Sugerir menu",
+    "suggestLoading": "Buscando las mejores recetas para esta visita...",
+    "suggestError": "No se pudieron generar sugerencias. Intentalo de nuevo.",
+    "confirmSelection": "Confirmar seleccion",
+    "selectionCount": "{{n}} de {{total}} seleccionados",
+    "removeRecipe": "Quitar receta",
+    "deletePlan": "Eliminar plan",
+    "deleteConfirm": "Esto eliminara el plan para {{date}}. No se puede deshacer.",
+    "duplicateDate": "Ya existe un plan para esta fecha. Edita el plan existente o elige otra fecha.",
+    "noPlans": "No hay menus planificados",
+    "noPlansBody": "Planifica tu proxima visita para comenzar.",
+    "visitDate": "Fecha de visita",
+    "recipes": "Recetas",
+    "editPlan": "Editar plan",
+    "draft": "Borrador",
+    "confirmed": "Confirmado",
+    "saveError": "No se pudieron guardar los cambios. Intentalo de nuevo.",
+    "listGenError": "No se pudo crear la lista de compras. Confirma el menu de nuevo.",
+    "rulesWarning": "Advertencia de reglas de cocina",
+    "rulesWarningBody": "{{description}}. Revisa antes de confirmar.",
+    "whySuggested": "Por que estas recetas?",
+    "addRecipes": "Agregar recetas",
+    "searchRecipes": "Buscar recetas...",
+    "recipesSelected": "{{n}} recetas seleccionadas"
+  },
+  "shopping": {
+    "title": "Lista de Compras",
+    "runningCount": "{{n}} de {{total}} listos",
+    "emptyList": "La lista esta vacia",
+    "emptyListBody": "Aun no hay ingredientes asignados.",
+    "addItem": "Agregar articulo a la lista",
+    "addItemPlaceholder": "Agregar un articulo...",
+    "fridgeStaples": "Siempre en casa",
+    "checkError": "Error al actualizar el articulo"
+  },
+  "cook": {
+    "shoppingListLink": "Lista de compras",
+    "noVisit": "No hay visita proxima",
+    "noVisitBody": "Tu proxima sesion aparecera aqui cuando sea programada."
   }
 }

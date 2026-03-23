@@ -132,5 +132,50 @@
     "back": "Back",
     "english": "English",
     "spanish": "Spanish"
+  },
+  "menu": {
+    "title": "Menu Plans",
+    "planMenu": "Plan menu",
+    "confirmMenu": "Confirm menu",
+    "confirming": "Confirming...",
+    "suggestMenu": "Suggest menu",
+    "suggestLoading": "Finding the best recipes for this visit...",
+    "suggestError": "Couldn't generate suggestions. Try again.",
+    "confirmSelection": "Confirm selection",
+    "selectionCount": "{{n}} of {{total}} selected",
+    "removeRecipe": "Remove recipe",
+    "deletePlan": "Delete plan",
+    "deleteConfirm": "This will delete the plan for {{date}}. This cannot be undone.",
+    "duplicateDate": "A plan for this date already exists. Edit the existing plan or choose a different date.",
+    "noPlans": "No upcoming menus planned",
+    "noPlansBody": "Plan your next visit to get started.",
+    "visitDate": "Visit date",
+    "recipes": "Recipes",
+    "editPlan": "Edit plan",
+    "draft": "Draft",
+    "confirmed": "Confirmed",
+    "saveError": "Couldn't save your changes. Try again.",
+    "listGenError": "Couldn't create the shopping list. Confirm the menu again to retry.",
+    "rulesWarning": "Cooking rules warning",
+    "rulesWarningBody": "{{description}}. Review before confirming.",
+    "whySuggested": "Why these recipes?",
+    "addRecipes": "Add recipes",
+    "searchRecipes": "Search recipes...",
+    "recipesSelected": "{{n}} recipes selected"
+  },
+  "shopping": {
+    "title": "Shopping List",
+    "runningCount": "{{n}} of {{total}} checked",
+    "emptyList": "Shopping list is empty",
+    "emptyListBody": "No ingredients assigned yet.",
+    "addItem": "Add item to shopping list",
+    "addItemPlaceholder": "Add an item...",
+    "fridgeStaples": "Always in stock",
+    "checkError": "Failed to update item"
+  },
+  "cook": {
+    "shoppingListLink": "Lista de compras",
+    "noVisit": "No upcoming visit",
+    "noVisitBody": "Your next cooking session will appear here when scheduled."
   }
 }
