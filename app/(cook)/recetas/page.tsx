@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { BookOpen, Clock, Users } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
@@ -57,8 +58,8 @@ export default async function RecetasPage() {
             </h2>
             <div className="space-y-3">
               {catRecipes.map((recipe) => (
+                <Link key={recipe.id} href={`/recetas/${recipe.id}`} className="block">
                 <Card
-                  key={recipe.id}
                   style={{ border: '1px solid #E8E0D0', backgroundColor: '#FFFFFF' }}
                 >
                   <CardContent className="pt-4 pb-4">
@@ -164,6 +165,7 @@ export default async function RecetasPage() {
                     )}
                   </CardContent>
                 </Card>
+                </Link>
               ))}
             </div>
           </div>

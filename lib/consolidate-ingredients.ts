@@ -1,5 +1,45 @@
 import type { Ingredient } from '@/lib/types'
 
+const CATEGORY_KEYWORDS: Record<string, string[]> = {
+  Produce: [
+    'tomato', 'onion', 'garlic', 'lime', 'lemon', 'cilantro', 'jalapeño', 'jalapen',
+    'avocado', 'mango', 'cucumber', 'pepper', 'spinach', 'kale', 'lettuce',
+    'carrot', 'celery', 'zucchini', 'mushroom', 'date', 'apple', 'banana',
+    'ginger', 'scallion', 'green onion', 'cabbage', 'corn', 'potato',
+  ],
+  Protein: [
+    'chicken', 'beef', 'pork', 'shrimp', 'salmon', 'tuna', 'turkey', 'egg',
+    'tofu', 'tempeh', 'lentil', 'bean', 'chickpea', 'almond butter', 'peanut butter',
+  ],
+  Dairy: [
+    'cheese', 'milk', 'cream', 'butter', 'yogurt', 'sour cream', 'crema',
+    'cotija', 'queso', 'parmesan', 'mozzarella', 'feta',
+  ],
+  Grains: [
+    'oat', 'rice', 'quinoa', 'pasta', 'bread', 'tortilla', 'flour', 'breadcrumb',
+    'noodle', 'couscous', 'barley',
+  ],
+  Pantry: [
+    'oil', 'vinegar', 'soy sauce', 'broth', 'stock', 'coconut milk', 'tomato paste',
+    'tomato sauce', 'salsa', 'honey', 'maple syrup', 'chocolate chip', 'cocoa',
+    'vanilla', 'almond', 'walnut', 'pecan', 'cashew', 'chia', 'flax',
+    'tahini', 'mustard', 'mayonnaise', 'ketchup', 'worcestershire',
+  ],
+  Spices: [
+    'salt', 'pepper', 'cumin', 'paprika', 'chili', 'oregano', 'thyme', 'rosemary',
+    'cinnamon', 'turmeric', 'cayenne', 'coriander', 'bay leaf', 'allspice',
+    'garlic powder', 'onion powder', 'seasoning', 'spice',
+  ],
+}
+
+function inferCategory(nameEn: string): string {
+  const lower = nameEn.toLowerCase()
+  for (const [cat, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+    if (keywords.some(k => lower.includes(k))) return cat
+  }
+  return 'Other'
+}
+
 export interface ConsolidatedItem {
   ingredient_name_en: string
   ingredient_name_es: string
@@ -55,7 +95,7 @@ export function consolidateIngredients(
           ingredient_name_es: ingredient.name_es,
           quantity: isNaN(qty) ? null : qty,
           unit: normalizedUnit === '' ? null : normalizedUnit,
-          category: ingredient.category ?? 'Other',
+          category: ingredient.category ?? inferCategory(ingredient.name_en),
           source_recipe_ids: [recipe.id],
         })
       }
