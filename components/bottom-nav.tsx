@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 
 const cookNavItems = [
   { labelEs: 'Próxima Visita', href: '/visita', icon: Home },
-  { labelEs: 'Compras', href: '/compras', icon: ShoppingCart },
+  { labelEs: 'Lista', href: '/lista', icon: ShoppingCart },
   { labelEs: 'Recetas', href: '/recetas', icon: BookOpen },
   { labelEs: 'Mensajes', href: '/mensajes', icon: MessageSquare },
 ]

@@ -32,7 +32,7 @@ const navItems = [
   },
   {
     key: 'nav.menuPlanning',
-    href: '/menu-planning',
+    href: '/menus',
     icon: CalendarDays,
     active: false,
   },
