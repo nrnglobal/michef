@@ -1,3 +1,17 @@
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: unknown
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-03-23T01:47:38.493Z"
+progress:
+  total_phases: 5
+  completed_phases: 0
+  total_plans: 4
+  completed_plans: 1
+---
+
 # Project State
 
 ## Project Reference
@@ -5,20 +19,17 @@
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** The cook arrives prepared — with a confirmed menu in Spanish, a ready-to-check shopping list, and no language barrier between her and the household.
-**Current focus:** Phase 2 — Menu Planning and Shopping
+**Current focus:** Phase 02 — Menu Planning and Shopping
 
 ## Current Position
 
-Phase: 2 of 5 (Menu Planning and Shopping)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-03-22 — Roadmap created; Phase 1 complete
-
-Progress: [██░░░░░░░░] 20%
+Phase: 02 (Menu Planning and Shopping) — EXECUTING
+Plan: 2 of 4
 
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 0 (Phase 2+ not yet started)
 - Average duration: -
 - Total execution time: -
@@ -30,10 +41,12 @@ Progress: [██░░░░░░░░] 20%
 | 1. Foundation | complete | - | - |
 
 **Recent Trend:**
+
 - Last 5 plans: -
 - Trend: -
 
 *Updated after each plan completion*
+| Phase 02 P01 | 3 | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -46,6 +59,9 @@ Recent decisions affecting current work:
 - [Architecture]: All Claude API calls go server-side via `app/api/ai/*` route handlers — never expose `CLAUDE_API_KEY` to the browser
 - [Phase 3]: Use Claude Haiku for translation, Sonnet for recipe generation/adjustment; enable prompt caching from day one to control costs
 - [Phase 5]: Service worker scoped to `/lista` cook route only; no Background Sync — use `window.addEventListener('online')` fallback for iOS compatibility
+- [Phase 02]: Sidebar menuPlanning href changed to /menus with active: false per D-01 — dashboard CTA is primary Phase 2 entry point
+- [Phase 02]: env fallback removed from server.ts; non-null assertion (!) matches client.ts pattern; crashes on missing config rather than masking it
+- [Phase 02]: shopping_list_items INSERT open to both roles (client on confirm, cook for ad-hoc); UPDATE restricted to cook only per SHOP-07
 
 ### Pending Todos
 
@@ -59,6 +75,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-22
-Stopped at: Roadmap created, all files written. Phase 2 is next — start with `/gsd:plan-phase 2`
+Last session: 2026-03-23T01:47:38.490Z
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None

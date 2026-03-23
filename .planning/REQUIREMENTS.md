@@ -7,9 +7,9 @@
 
 ### Infrastructure (Tech Debt — Phase 2 prerequisites)
 
-- [ ] **INFRA-01**: Middleware file is named `middleware.ts` (not `proxy.ts`) so Next.js edge runtime picks it up correctly
-- [ ] **INFRA-02**: RLS policies are scoped to role-based writes (cook can only write to her own check-offs; client can only write to their own menu plans)
-- [ ] **INFRA-03**: Supabase URL env var has no placeholder fallback that masks misconfiguration in production
+- [x] **INFRA-01**: Middleware file is named `middleware.ts` (not `proxy.ts`) so Next.js edge runtime picks it up correctly
+- [x] **INFRA-02**: RLS policies are scoped to role-based writes (cook can only write to her own check-offs; client can only write to their own menu plans)
+- [x] **INFRA-03**: Supabase URL env var has no placeholder fallback that masks misconfiguration in production
 
 ### Menu Planning
 
@@ -102,9 +102,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | Phase 2 | Pending |
-| INFRA-02 | Phase 2 | Pending |
-| INFRA-03 | Phase 2 | Pending |
+| INFRA-01 | Phase 2 | Complete |
+| INFRA-02 | Phase 2 | Complete |
+| INFRA-03 | Phase 2 | Complete |
 | MENU-01 | Phase 2 | Pending |
 | MENU-02 | Phase 2 | Pending |
 | MENU-03 | Phase 2 | Pending |
