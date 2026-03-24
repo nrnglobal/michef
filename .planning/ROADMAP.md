@@ -63,7 +63,7 @@ Plans:
 Plans:
 - [x] 03-01-PLAN.md — Foundation: vitest, parent_recipe_id migration, CSS diff vars, test stubs
 - [x] 03-02-PLAN.md — Recipe generation: Claude Sonnet generate-recipe route + GenerateRecipeModal
-- [ ] 03-03-PLAN.md — Receipt OCR: Claude Haiku extract-receipt route + upload/review components
+- [x] 03-03-PLAN.md — Receipt OCR: Claude Haiku extract-receipt route + upload/review components
 - [x] 03-04-PLAN.md — URL import: import-url route + collapsible UrlImportSection on /recipes/new
 - [ ] 03-05-PLAN.md — Recipe adjustment + variants: adjust-recipe route, FeedbackForm, RecipeDiffView, Duplicate, variant grouping
 

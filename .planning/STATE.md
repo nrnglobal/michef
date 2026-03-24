@@ -52,6 +52,7 @@ Plan: 4 of 5
 | Phase 03 P01 | 3 | 2 tasks | 11 files |
 | Phase 03 P04 | 2 | 2 tasks | 3 files |
 | Phase 03 P02 | 3 | 2 tasks | 5 files |
+| Phase 03 P03 | 3 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,9 @@ Recent decisions affecting current work:
 - [Phase 03]: Test stubs use mock data objects rather than actual HTTP calls — avoids need for server in unit tests; image-resize uses expect(true).toBe(true) because Canvas API unavailable in jsdom
 - [Phase 03]: No prompt caching on URL import: each URL has unique content, caching would not help
 - [Phase 03 P02]: Prompt caching requires anthropic-beta header (prompt-caching-2024-07-31) alongside cache_control on system prompt block; without the header, cache_control is silently ignored
+- [Phase 03 P03]: No prompt caching on extract-receipt route — Haiku minimum 4096 tokens not reached by receipt OCR prompts (per Pitfall 3)
+- [Phase 03 P03]: Storage upload and OCR run in parallel via Promise.all to minimize total wait time for cook
+- [Phase 03 P03]: Discard in receipt-review calls onSaved without persisting to prevent partial receipt data in visits table (per D-14)
 
 ### Pending Todos
 
@@ -85,6 +89,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-24T01:40:35.374Z
-Stopped at: Completed 03-04-PLAN.md
+Last session: 2026-03-24T01:41:00Z
+Stopped at: Completed 03-03-PLAN.md
 Resume file: None
