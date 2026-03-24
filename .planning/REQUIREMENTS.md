@@ -35,7 +35,7 @@
 - [ ] **AIREC-01**: Client can generate a new recipe idea via Claude API using household dietary rules, preferences, and recent history as context
 - [ ] **AIREC-02**: Client can leave structured feedback on a cooked recipe (1–5 star rating, feedback text, adjustment type)
 - [ ] **AIREC-03**: App generates an AI-adjusted version of a recipe incorporating the client's feedback, shown with a highlighted diff of what changed
-- [ ] **AIREC-04**: Adjusted recipe can be saved as the new version (original preserved in history) or saved as a named variant
+- [x] **AIREC-04**: Adjusted recipe can be saved as the new version (original preserved in history) or saved as a named variant
 
 ### AI — Import & OCR
 
@@ -121,7 +121,7 @@
 | AIREC-01 | Phase 3 | Pending |
 | AIREC-02 | Phase 3 | Pending |
 | AIREC-03 | Phase 3 | Pending |
-| AIREC-04 | Phase 3 | Pending |
+| AIREC-04 | Phase 3 | Complete |
 | AIOCR-01 | Phase 3 | Pending |
 | AIOCR-02 | Phase 3 | Pending |
 | AIOCR-03 | Phase 3 | Pending |
