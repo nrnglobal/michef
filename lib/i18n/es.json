@@ -177,5 +177,14 @@
     "shoppingListLink": "Lista de compras",
     "noVisit": "No hay visita proxima",
     "noVisitBody": "Tu proxima sesion aparecera aqui cuando sea programada."
+  },
+  "generateRecipe": {
+    "title": "Generar Receta",
+    "category": "Categoría",
+    "proteinFocus": "Proteína (opcional)",
+    "proteinFocusPlaceholder": "ej. salmón, pechuga de pollo...",
+    "generate": "Generar",
+    "generating": "Generando...",
+    "cancel": "Cancelar"
   }
 }

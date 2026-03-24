@@ -177,5 +177,14 @@
     "shoppingListLink": "Lista de compras",
     "noVisit": "No upcoming visit",
     "noVisitBody": "Your next cooking session will appear here when scheduled."
+  },
+  "generateRecipe": {
+    "title": "Generate Recipe",
+    "category": "Category",
+    "proteinFocus": "Protein Focus (optional)",
+    "proteinFocusPlaceholder": "e.g. salmon, chicken breast...",
+    "generate": "Generate",
+    "generating": "Generating...",
+    "cancel": "Cancel"
   }
 }

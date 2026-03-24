@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { Plus, Search } from 'lucide-react'
+import { Plus, Search, Sparkles, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { RecipeCard } from '@/components/recipe-card'
+import { GenerateRecipeModal } from '@/components/generate-recipe-modal'
+import { RecipeForm } from '@/components/recipe-form'
 import { createClient } from '@/lib/supabase/client'
 import { useI18n } from '@/lib/i18n/config'
 import type { Recipe } from '@/lib/types'
@@ -30,6 +32,9 @@ export default function RecipesPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('all')
+  const [showGenerate, setShowGenerate] = useState(false)
+  const [generatedRecipe, setGeneratedRecipe] = useState<Partial<Recipe> | null>(null)
+  const [genKey, setGenKey] = useState(0)
 
   const fetchRecipes = useCallback(async () => {
     setLoading(true)
@@ -65,36 +70,47 @@ export default function RecipesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold" style={{ color: '#1A1410' }}>
+          <h1 className="text-2xl font-semibold" style={{ color: 'var(--casa-text)' }}>
             {t('recipes.title')}
           </h1>
-          <p className="text-sm mt-0.5" style={{ color: '#6B5B3E' }}>
+          <p className="text-sm mt-0.5" style={{ color: 'var(--casa-text-muted)' }}>
             {recipes.length} recipe{recipes.length !== 1 ? 's' : ''} in your library
           </p>
         </div>
-        <Link href="/recipes/new">
+        <div className="flex gap-2">
           <Button
-            style={{ backgroundColor: '#8B6914', color: '#FFFFFF' }}
+            onClick={() => setShowGenerate(true)}
+            variant="outline"
+            style={{ borderColor: 'var(--casa-primary)', color: 'var(--casa-primary)' }}
             className="gap-1.5"
           >
-            <Plus className="w-4 h-4" />
-            {t('recipes.addRecipe')}
+            <Sparkles className="w-4 h-4" />
+            Generate
           </Button>
-        </Link>
+          <Link href="/recipes/new">
+            <Button
+              style={{ backgroundColor: 'var(--casa-primary)', color: 'var(--casa-surface)' }}
+              className="gap-1.5"
+            >
+              <Plus className="w-4 h-4" />
+              {t('recipes.addRecipe')}
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Search */}
       <div className="relative">
         <Search
           className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
-          style={{ color: '#9B8B70' }}
+          style={{ color: 'var(--casa-text-faint)' }}
         />
         <Input
           placeholder={t('recipes.search')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="pl-9"
-          style={{ borderColor: '#E8E0D0' }}
+          style={{ borderColor: 'var(--casa-border)' }}
         />
       </div>
 
@@ -102,7 +118,7 @@ export default function RecipesPage() {
       <Tabs value={category} onValueChange={setCategory}>
         <TabsList
           className="flex flex-wrap gap-1 h-auto p-1 rounded-lg"
-          style={{ backgroundColor: '#F0EBE0' }}
+          style={{ backgroundColor: 'var(--casa-surface-3)' }}
         >
           {CATEGORIES.map((cat) => (
             <TabsTrigger
@@ -110,7 +126,7 @@ export default function RecipesPage() {
               value={cat}
               className="text-xs px-3 py-1.5 rounded-md data-[state=active]:shadow-sm capitalize"
               style={{
-                color: category === cat ? '#8B6914' : '#4A3B28',
+                color: category === cat ? 'var(--casa-primary)' : 'var(--casa-text-dark)',
               }}
             >
               {t(`recipes.categories.${cat}`)}
@@ -119,6 +135,29 @@ export default function RecipesPage() {
         </TabsList>
       </Tabs>
 
+      {/* Generated Recipe Preview */}
+      {generatedRecipe && (
+        <div
+          className="rounded-xl p-6 space-y-4"
+          style={{ border: '1px solid var(--casa-primary)', backgroundColor: 'var(--casa-surface)' }}
+        >
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--casa-text)' }}>
+              Generated Recipe — Review &amp; Save
+            </h2>
+            <button
+              onClick={() => setGeneratedRecipe(null)}
+              className="p-1 rounded hover:opacity-70 transition-opacity"
+              style={{ color: 'var(--casa-text-muted)' }}
+              aria-label="Dismiss generated recipe"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <RecipeForm key={genKey} recipe={generatedRecipe as Recipe} />
+        </div>
+      )}
+
       {/* Recipe Grid */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -126,7 +165,7 @@ export default function RecipesPage() {
             <div
               key={i}
               className="h-36 rounded-xl animate-pulse"
-              style={{ backgroundColor: '#E8E0D0' }}
+              style={{ backgroundColor: 'var(--casa-border)' }}
             />
           ))}
         </div>
@@ -139,12 +178,12 @@ export default function RecipesPage() {
       ) : (
         <div
           className="text-center py-16 rounded-xl border"
-          style={{ borderColor: '#E8E0D0', borderStyle: 'dashed' }}
+          style={{ borderColor: 'var(--casa-border)', borderStyle: 'dashed' }}
         >
-          <p className="text-base font-medium" style={{ color: '#1A1410' }}>
+          <p className="text-base font-medium" style={{ color: 'var(--casa-text)' }}>
             {t('recipes.noResults')}
           </p>
-          <p className="text-sm mt-1" style={{ color: '#9B8B70' }}>
+          <p className="text-sm mt-1" style={{ color: 'var(--casa-text-faint)' }}>
             {search || category !== 'all'
               ? t('recipes.noResultsHint')
               : 'Add your first recipe to get started'}
@@ -153,7 +192,7 @@ export default function RecipesPage() {
             <Link href="/recipes/new">
               <Button
                 className="mt-4"
-                style={{ backgroundColor: '#8B6914', color: '#FFFFFF' }}
+                style={{ backgroundColor: 'var(--casa-primary)', color: 'var(--casa-surface)' }}
               >
                 <Plus className="w-4 h-4 mr-1.5" />
                 {t('recipes.addRecipe')}
@@ -162,6 +201,16 @@ export default function RecipesPage() {
           )}
         </div>
       )}
+
+      {/* Generate Recipe Modal */}
+      <GenerateRecipeModal
+        open={showGenerate}
+        onClose={() => setShowGenerate(false)}
+        onGenerated={(r) => {
+          setGeneratedRecipe(r)
+          setGenKey((k) => k + 1)
+        }}
+      />
     </div>
   )
 }
