@@ -127,7 +127,15 @@ export async function confirmMenuPlan(planId: string) {
 
   if (listError || !list) throw new Error(listError?.message ?? 'Failed to create shopping list')
 
-  // Insert consolidated ingredient items
+  // Fetch active fridge staples to exclude on-hand items from shopping list
+  const { data: staples } = await supabase
+    .from('fridge_staples')
+    .select('item_name_en')
+    .eq('is_active', true)
+
+  const onHand = new Set((staples ?? []).map((s: { item_name_en: string }) => s.item_name_en.toLowerCase().trim()))
+
+  // Insert consolidated ingredient items, excluding items already in inventory
   const ingredientItems = consolidated.map((item) => ({
     shopping_list_id: list.id,
     ingredient_name_en: item.ingredient_name_en,
@@ -140,10 +148,14 @@ export async function confirmMenuPlan(planId: string) {
     is_always_stock: false,
   }))
 
-  if (ingredientItems.length > 0) {
+  const filteredItems = ingredientItems.filter(
+    (item) => !onHand.has(item.ingredient_name_en.toLowerCase().trim())
+  )
+
+  if (filteredItems.length > 0) {
     const { error: insertError } = await supabase
       .from('shopping_list_items')
-      .insert(ingredientItems)
+      .insert(filteredItems)
     if (insertError) throw new Error(insertError.message)
   }
 
