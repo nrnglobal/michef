@@ -5,12 +5,13 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { formatDateEs } from '@/lib/utils'
 import type { Visit, MenuPlan, Recipe } from '@/lib/types'
+import { VisitaReceiptSection } from '@/components/visita-receipt-section'
 
 const statusColors: Record<string, { bg: string; text: string; label: string }> = {
   draft: { bg: '#F9FAFB', text: '#374151', label: 'Borrador' },
   confirmed: { bg: '#EFF6FF', text: '#1D4ED8', label: 'Confirmado' },
   shopping: { bg: '#FFF7ED', text: '#9A3412', label: 'De compras' },
-  cooking: { bg: '#FEF9EC', text: '#854D0E', label: 'Cocinando' },
+  cooking: { bg: 'var(--casa-primary-bg)', text: 'var(--casa-primary-text)', label: 'Cocinando' },
   done: { bg: '#F0FDF4', text: '#166534', label: 'Listo' },
 }
 
@@ -88,15 +89,15 @@ export default async function VisitaPage() {
       <div className="flex items-center gap-3">
         <div
           className="w-10 h-10 rounded-xl flex items-center justify-center"
-          style={{ backgroundColor: '#8B6914' }}
+          style={{ backgroundColor: 'var(--casa-primary)' }}
         >
           <ChefHat className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h1 className="text-xl font-semibold" style={{ color: '#1A1410' }}>
+          <h1 className="text-xl font-semibold" style={{ color: 'var(--casa-text)' }}>
             Próxima Visita
           </h1>
-          <p className="text-xs" style={{ color: '#6B5B3E' }}>
+          <p className="text-xs" style={{ color: 'var(--casa-text-muted)' }}>
             Tu próxima sesión de cocina
           </p>
         </div>
@@ -105,15 +106,15 @@ export default async function VisitaPage() {
       {visit ? (
         <>
           {/* Visit Date Card */}
-          <Card style={{ border: '1px solid #E8E0D0', backgroundColor: '#FFFFFF' }}>
+          <Card style={{ border: '1px solid var(--casa-border)', backgroundColor: 'var(--casa-surface)' }}>
             <CardContent className="pt-5">
               <div className="flex items-start gap-3">
-                <CalendarDays className="w-5 h-5 mt-0.5 shrink-0" style={{ color: '#8B6914' }} />
+                <CalendarDays className="w-5 h-5 mt-0.5 shrink-0" style={{ color: 'var(--casa-primary)' }} />
                 <div className="flex-1">
-                  <p className="text-xs font-semibold uppercase tracking-wide mb-0.5" style={{ color: '#9B8B70' }}>
+                  <p className="text-xs font-semibold uppercase tracking-wide mb-0.5" style={{ color: 'var(--casa-text-faint)' }}>
                     Fecha de visita
                   </p>
-                  <p className="font-semibold text-base capitalize" style={{ color: '#1A1410' }}>
+                  <p className="font-semibold text-base capitalize" style={{ color: 'var(--casa-text)' }}>
                     {formatDateEs(visit.visit_date)}
                   </p>
 
@@ -137,7 +138,7 @@ export default async function VisitaPage() {
                   )}
 
                   {visit.notes && (
-                    <p className="text-sm mt-2" style={{ color: '#6B5B3E' }}>
+                    <p className="text-sm mt-2" style={{ color: 'var(--casa-text-muted)' }}>
                       {visit.notes}
                     </p>
                   )}
@@ -148,7 +149,7 @@ export default async function VisitaPage() {
 
           {/* Menu */}
           <div>
-            <h2 className="font-semibold mb-3" style={{ color: '#1A1410' }}>
+            <h2 className="font-semibold mb-3" style={{ color: 'var(--casa-text)' }}>
               Menú del día
             </h2>
 
@@ -156,31 +157,31 @@ export default async function VisitaPage() {
               <div className="space-y-3">
                 {menuRecipes.map((recipe, idx) => (
                   <Link key={recipe.id} href={`/recetas/${recipe.id}`} className="block">
-                    <Card style={{ border: '1px solid #E8E0D0', backgroundColor: '#FFFFFF' }}>
+                    <Card style={{ border: '1px solid var(--casa-border)', backgroundColor: 'var(--casa-surface)' }}>
                       <CardContent className="pt-4 pb-4">
                         <div className="flex items-start gap-3">
                           <div
                             className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-sm font-bold"
-                            style={{ backgroundColor: '#FEF9EC', color: '#8B6914' }}
+                            style={{ backgroundColor: 'var(--casa-primary-bg)', color: 'var(--casa-primary)' }}
                           >
                             {idx + 1}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-sm" style={{ color: '#1A1410' }}>
+                            <p className="font-semibold text-sm" style={{ color: 'var(--casa-text)' }}>
                               {recipe.title_es}
                             </p>
-                            <p className="text-xs mt-0.5" style={{ color: '#9B8B70' }}>
+                            <p className="text-xs mt-0.5" style={{ color: 'var(--casa-text-faint)' }}>
                               {recipe.title_en}
                             </p>
                             {recipe.prep_time_minutes && (
-                              <p className="text-xs mt-1" style={{ color: '#9B8B70' }}>
+                              <p className="text-xs mt-1" style={{ color: 'var(--casa-text-faint)' }}>
                                 {recipe.prep_time_minutes} min
                               </p>
                             )}
                           </div>
                           <span
                             className="text-xs font-medium px-2 py-0.5 rounded-full capitalize shrink-0"
-                            style={{ backgroundColor: '#F0EBE0', color: '#6B5B3E' }}
+                            style={{ backgroundColor: 'var(--casa-surface-3)', color: 'var(--casa-text-muted)' }}
                           >
                             {recipe.category}
                           </span>
@@ -193,9 +194,9 @@ export default async function VisitaPage() {
             ) : (
               <div
                 className="text-center py-10 rounded-xl border"
-                style={{ borderColor: '#E8E0D0', borderStyle: 'dashed' }}
+                style={{ borderColor: 'var(--casa-border)', borderStyle: 'dashed' }}
               >
-                <p className="text-sm" style={{ color: '#9B8B70' }}>
+                <p className="text-sm" style={{ color: 'var(--casa-text-faint)' }}>
                   No hay menú asignado para esta visita aún.
                 </p>
               </div>
@@ -208,8 +209,8 @@ export default async function VisitaPage() {
               href="/lista"
               className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border text-sm font-semibold transition-colors hover:opacity-90"
               style={{
-                color: '#8B6914',
-                borderColor: '#8B6914',
+                color: 'var(--casa-primary)',
+                borderColor: 'var(--casa-primary)',
                 backgroundColor: 'transparent',
               }}
             >
@@ -218,26 +219,36 @@ export default async function VisitaPage() {
             </Link>
           )}
 
+          {/* Receipt upload section */}
+          {visit && (
+            <div>
+              <h2 className="font-semibold mb-3" style={{ color: 'var(--casa-text)' }}>
+                Recibo de compras
+              </h2>
+              <VisitaReceiptSection visitId={visit.id} />
+            </div>
+          )}
+
           {/* Payment info */}
           {(visit.grocery_total || visit.service_fee || visit.total_payment) && (
-            <Card style={{ border: '1px solid #E8E0D0', backgroundColor: '#FFFFFF' }}>
+            <Card style={{ border: '1px solid var(--casa-border)', backgroundColor: 'var(--casa-surface)' }}>
               <CardContent className="pt-5">
-                <h3 className="font-semibold text-sm mb-3" style={{ color: '#1A1410' }}>
+                <h3 className="font-semibold text-sm mb-3" style={{ color: 'var(--casa-text)' }}>
                   Información de pago
                 </h3>
                 <div className="space-y-2">
                   {visit.grocery_total && (
                     <div className="flex justify-between text-sm">
-                      <span style={{ color: '#6B5B3E' }}>Compras</span>
-                      <span style={{ color: '#1A1410' }}>
+                      <span style={{ color: 'var(--casa-text-muted)' }}>Compras</span>
+                      <span style={{ color: 'var(--casa-text)' }}>
                         ${visit.grocery_total.toFixed(2)}
                       </span>
                     </div>
                   )}
                   {visit.service_fee && (
                     <div className="flex justify-between text-sm">
-                      <span style={{ color: '#6B5B3E' }}>Servicio</span>
-                      <span style={{ color: '#1A1410' }}>
+                      <span style={{ color: 'var(--casa-text-muted)' }}>Servicio</span>
+                      <span style={{ color: 'var(--casa-text)' }}>
                         ${visit.service_fee.toFixed(2)}
                       </span>
                     </div>
@@ -245,10 +256,10 @@ export default async function VisitaPage() {
                   {visit.total_payment && (
                     <div
                       className="flex justify-between text-sm font-semibold pt-2 border-t"
-                      style={{ borderColor: '#E8E0D0' }}
+                      style={{ borderColor: 'var(--casa-border)' }}
                     >
-                      <span style={{ color: '#1A1410' }}>Total</span>
-                      <span style={{ color: '#8B6914' }}>
+                      <span style={{ color: 'var(--casa-text)' }}>Total</span>
+                      <span style={{ color: 'var(--casa-primary)' }}>
                         ${visit.total_payment.toFixed(2)}
                       </span>
                     </div>
@@ -274,16 +285,16 @@ export default async function VisitaPage() {
       ) : (
         <div
           className="text-center py-16 rounded-2xl border"
-          style={{ borderColor: '#E8E0D0', borderStyle: 'dashed' }}
+          style={{ borderColor: 'var(--casa-border)', borderStyle: 'dashed' }}
         >
           <CalendarDays
             className="w-10 h-10 mx-auto mb-3"
-            style={{ color: '#C4B49A' }}
+            style={{ color: 'var(--casa-icon-muted)' }}
           />
-          <p className="font-medium" style={{ color: '#1A1410' }}>
+          <p className="font-medium" style={{ color: 'var(--casa-text)' }}>
             No hay visita próxima
           </p>
-          <p className="text-sm mt-1" style={{ color: '#9B8B70' }}>
+          <p className="text-sm mt-1" style={{ color: 'var(--casa-text-faint)' }}>
             Tu próxima sesión aparecerá aquí cuando sea programada.
           </p>
         </div>
