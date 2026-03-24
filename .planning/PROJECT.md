@@ -33,11 +33,11 @@ The cook arrives prepared — with a confirmed menu in Spanish, a ready-to-check
 - [ ] Cook's mobile shopping list — large checkboxes, category grouping, running count, check-off
 - [ ] Fridge staples section appended to every shopping list
 
-**Phase 3 — AI Features**
-- [ ] Recipe generation — Claude generates new recipes from household preferences + active rules
-- [ ] Recipe adjustment — client feedback triggers Claude to produce an adjusted recipe with diff view
-- [ ] Receipt OCR — cook uploads receipt photo, Claude extracts line items and totals
-- [ ] Recipe import from URL — Claude parses a recipe page into a structured recipe
+**Phase 3 — AI Features** *(Validated 2026-03-24)*
+- ✓ Recipe generation — Claude generates new recipes from household preferences + active rules
+- ✓ Recipe adjustment — client feedback triggers Claude to produce an adjusted recipe with diff view
+- ✓ Receipt OCR — cook uploads receipt photo, Claude extracts line items and totals
+- ✓ Recipe import from URL — Claude parses a recipe page into a structured recipe
 
 **Phase 4 — Communication & Finance**
 - [ ] Bilingual messaging — client writes English, cook sees Spanish (and vice versa), Claude translates
@@ -115,4 +115,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-22 after initialization*
+*Last updated: 2026-03-24 — Phase 3 AI Features complete*
