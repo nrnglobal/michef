@@ -58,7 +58,14 @@ Plans:
   2. Client can leave structured feedback (rating + text) on a cooked recipe and receive an AI-adjusted version showing a highlighted diff of what changed; client can save the new version or discard
   3. Client can paste a URL and have Claude parse it into a pre-filled recipe form
   4. Cook can upload a receipt photo (resized client-side to ≤5 MB); client can review extracted line items and totals from Claude Vision and save or correct them
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Foundation: vitest, parent_recipe_id migration, CSS diff vars, test stubs
+- [ ] 03-02-PLAN.md — Recipe generation: Claude Sonnet generate-recipe route + GenerateRecipeModal
+- [ ] 03-03-PLAN.md — Receipt OCR: Claude Haiku extract-receipt route + upload/review components
+- [ ] 03-04-PLAN.md — URL import: import-url route + collapsible UrlImportSection on /recipes/new
+- [ ] 03-05-PLAN.md — Recipe adjustment + variants: adjust-recipe route, FeedbackForm, RecipeDiffView, Duplicate, variant grouping
 
 ### Phase 4: Communication and Finance
 **Goal**: Client and cook can communicate across the language barrier in real time, and the client has full visibility into visit costs and payment status
@@ -90,6 +97,6 @@ Phases execute in numeric order: 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Foundation | - | Complete | 2026-03-22 |
 | 2. Menu Planning and Shopping | 4/4 | Complete   | 2026-03-23 |
-| 3. AI Features | 0/TBD | Not started | - |
+| 3. AI Features | 0/5 | Not started | - |
 | 4. Communication and Finance | 0/TBD | Not started | - |
 | 5. Polish | 0/TBD | Not started | - |
