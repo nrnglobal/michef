@@ -34,6 +34,7 @@ export interface Recipe {
   is_active: boolean
   created_at: string
   updated_at: string
+  parent_recipe_id?: string  // FK to parent recipe for variant support (D-07)
 }
 
 export interface RecipeFeedback {

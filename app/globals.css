@@ -126,6 +126,7 @@
   }
   html {
     @apply font-sans;
+    font-size: 24px;
   }
 }
 
@@ -134,8 +135,40 @@
   --casa-primary: #8B6914;
   --casa-bg: #FAFAF8;
   --casa-surface: #FFFFFF;
+  --casa-surface-2: #F5F0E8;
+  --casa-surface-3: #F0EBE0;
   --casa-border: #E8E0D0;
   --casa-text: #1A1410;
   --casa-text-muted: #6B5B3E;
   --casa-text-faint: #9B8B70;
+  --casa-primary-bg: #FEF9EC;
+  --casa-primary-text: #854D0E;
+  --casa-text-dark: #4A3B28;
+  --casa-icon-muted: #C4B49A;
+  --casa-disabled: #B8A89A;
+  --casa-diff-add-bg: #F0FDF4;
+  --casa-diff-add-text: #166534;
+  --casa-diff-del-bg: #FEF2F2;
+  --casa-diff-del-text: #991B1B;
+}
+
+.dark {
+  --casa-primary: #C4A040;
+  --casa-primary-bg: #2A2010;
+  --casa-primary-text: #E8C060;
+  --casa-bg: #1A1510;
+  --casa-surface: #231E15;
+  --casa-surface-2: #2A2418;
+  --casa-surface-3: #302820;
+  --casa-border: #3A3025;
+  --casa-text: #F0EBE0;
+  --casa-text-dark: #D4C4A8;
+  --casa-text-muted: #C4B49A;
+  --casa-text-faint: #9B8B70;
+  --casa-icon-muted: #6B5B3E;
+  --casa-disabled: #6B5B3E;
+  --casa-diff-add-bg: #052E16;
+  --casa-diff-add-text: #86EFAC;
+  --casa-diff-del-bg: #450A0A;
+  --casa-diff-del-text: #FCA5A5;
 }
