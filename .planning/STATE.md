@@ -90,6 +90,7 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260324-bve | add Inventory page for Client to track food items on hand so shopping list only shows missing items | 2026-03-24 | 103aebf | [260324-bve-add-inventory-page-for-client-to-track-f](.planning/quick/260324-bve-add-inventory-page-for-client-to-track-f/) |
+| 260324-ccy | client needs ability to edit/remove existing shopping list items | 2026-03-24 | 610dd03 | [260324-ccy-client-needs-ability-to-edit-remove-exis](.planning/quick/260324-ccy-client-needs-ability-to-edit-remove-exis/) |
 
 ### Blockers/Concerns
 
@@ -99,4 +100,4 @@ None yet.
 
 ## Session Continuity
 
-Last activity: 2026-03-24 - Completed quick task 260324-bve: add Inventory page for Client to track food items on hand so shopping list only shows missing items
+Last activity: 2026-03-24 - Completed quick task 260324-ccy: client needs ability to edit/remove existing shopping list items
