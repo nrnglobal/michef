@@ -11,6 +11,7 @@ import {
   Settings,
   LogOut,
   ChefHat,
+  Refrigerator,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
@@ -40,6 +41,12 @@ const navItems = [
     key: 'nav.shoppingLists',
     href: '/shopping-lists',
     icon: ShoppingCart,
+    active: true,
+  },
+  {
+    key: 'nav.inventory',
+    href: '/inventory',
+    icon: Refrigerator,
     active: true,
   },
   {
