@@ -42,7 +42,7 @@
 - [ ] **AIOCR-01**: Cook can upload a receipt photo after shopping (client-side resize to ≤5 MB before upload to Supabase Storage)
 - [ ] **AIOCR-02**: App uses Claude vision to extract store name, date, line items, and total from the uploaded receipt image
 - [ ] **AIOCR-03**: Client can review and correct extracted receipt data before saving
-- [ ] **AIURL-01**: Client can import a recipe by pasting a URL; Claude parses the page and populates the recipe form
+- [x] **AIURL-01**: Client can import a recipe by pasting a URL; Claude parses the page and populates the recipe form
 
 ### Messaging
 
@@ -125,7 +125,7 @@
 | AIOCR-01 | Phase 3 | Pending |
 | AIOCR-02 | Phase 3 | Pending |
 | AIOCR-03 | Phase 3 | Pending |
-| AIURL-01 | Phase 3 | Pending |
+| AIURL-01 | Phase 3 | Complete |
 | MSG-01 | Phase 4 | Pending |
 | MSG-02 | Phase 4 | Pending |
 | MSG-03 | Phase 4 | Pending |
