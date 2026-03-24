@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { Recipe, RecipeFeedback, Ingredient } from '@/lib/types'
 import { ArchiveRecipeButton } from './archive-button'
+import { RecipeDetailActions } from './recipe-detail-actions'
+import { toTitleCase, formatInstructions } from '@/lib/utils'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -41,7 +43,7 @@ export default async function RecipeDetailPage({ params }: PageProps) {
         <Link
           href="/recipes"
           className="flex items-center gap-1.5 text-sm font-medium hover:underline"
-          style={{ color: '#8B6914' }}
+          style={{ color: 'var(--casa-primary)' }}
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Recipes
@@ -51,7 +53,7 @@ export default async function RecipeDetailPage({ params }: PageProps) {
             <Button
               variant="outline"
               size="sm"
-              style={{ borderColor: '#E8E0D0', color: '#4A3B28' }}
+              style={{ borderColor: 'var(--casa-border)', color: 'var(--casa-text-dark)' }}
             >
               Edit Recipe
             </Button>
@@ -60,14 +62,17 @@ export default async function RecipeDetailPage({ params }: PageProps) {
         </div>
       </div>
 
+      {/* AI actions: Adjust, Duplicate, Feedback */}
+      <RecipeDetailActions recipe={r} />
+
       {/* Title + Meta */}
       <div>
         <div className="flex items-start gap-3 mb-2">
           <div className="flex-1">
-            <h1 className="text-2xl font-semibold" style={{ color: '#1A1410' }}>
+            <h1 className="text-2xl font-semibold" style={{ color: 'var(--casa-text)' }}>
               {r.title_en}
             </h1>
-            <p className="text-base mt-0.5" style={{ color: '#6B5B3E' }}>
+            <p className="text-base mt-0.5" style={{ color: 'var(--casa-text-muted)' }}>
               {r.title_es}
             </p>
           </div>
@@ -84,23 +89,23 @@ export default async function RecipeDetailPage({ params }: PageProps) {
         <div className="flex items-center gap-4 mt-3">
           <span
             className="inline-flex items-center text-sm font-medium px-2.5 py-0.5 rounded-full capitalize"
-            style={{ backgroundColor: '#FEF9EC', color: '#854D0E' }}
+            style={{ backgroundColor: 'var(--casa-primary-bg)', color: 'var(--casa-primary-text)' }}
           >
             {r.category}
           </span>
           {r.protein_type && (
-            <span className="text-sm" style={{ color: '#6B5B3E' }}>
+            <span className="text-sm" style={{ color: 'var(--casa-text-muted)' }}>
               {r.protein_type}
             </span>
           )}
           {r.prep_time_minutes && (
-            <div className="flex items-center gap-1" style={{ color: '#9B8B70' }}>
+            <div className="flex items-center gap-1" style={{ color: 'var(--casa-text-faint)' }}>
               <Clock className="w-4 h-4" />
               <span className="text-sm">{r.prep_time_minutes} min</span>
             </div>
           )}
           {r.servings && (
-            <div className="flex items-center gap-1" style={{ color: '#9B8B70' }}>
+            <div className="flex items-center gap-1" style={{ color: 'var(--casa-text-faint)' }}>
               <Users className="w-4 h-4" />
               <span className="text-sm">
                 {r.servings} serving{r.servings !== 1 ? 's' : ''}
@@ -115,7 +120,7 @@ export default async function RecipeDetailPage({ params }: PageProps) {
               <span
                 key={tag}
                 className="text-xs px-2 py-0.5 rounded-full"
-                style={{ backgroundColor: '#F0EBE0', color: '#6B5B3E' }}
+                style={{ backgroundColor: 'var(--casa-surface-3)', color: 'var(--casa-text-muted)' }}
               >
                 #{tag}
               </span>
@@ -143,20 +148,20 @@ export default async function RecipeDetailPage({ params }: PageProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {r.description_en && (
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: '#9B8B70' }}>
+              <p className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: 'var(--casa-text-faint)' }}>
                 English
               </p>
-              <p className="text-sm" style={{ color: '#1A1410' }}>
+              <p className="text-sm" style={{ color: 'var(--casa-text)' }}>
                 {r.description_en}
               </p>
             </div>
           )}
           {r.description_es && (
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: '#9B8B70' }}>
+              <p className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: 'var(--casa-text-faint)' }}>
                 Español
               </p>
-              <p className="text-sm" style={{ color: '#1A1410' }}>
+              <p className="text-sm" style={{ color: 'var(--casa-text)' }}>
                 {r.description_es}
               </p>
             </div>
@@ -166,9 +171,9 @@ export default async function RecipeDetailPage({ params }: PageProps) {
 
       {/* Ingredients */}
       {r.ingredients?.length > 0 && (
-        <Card style={{ border: '1px solid #E8E0D0', backgroundColor: '#FFFFFF' }}>
+        <Card style={{ border: '1px solid var(--casa-border)', backgroundColor: 'var(--casa-surface)' }}>
           <CardHeader>
-            <CardTitle className="text-base" style={{ color: '#1A1410' }}>
+            <CardTitle className="text-base" style={{ color: 'var(--casa-text)' }}>
               Ingredients
             </CardTitle>
           </CardHeader>
@@ -178,19 +183,19 @@ export default async function RecipeDetailPage({ params }: PageProps) {
                 <div
                   key={idx}
                   className="flex items-center justify-between py-1.5 border-b last:border-0"
-                  style={{ borderColor: '#F0EBE0' }}
+                  style={{ borderColor: 'var(--casa-surface-3)' }}
                 >
                   <div>
-                    <span className="text-sm font-medium" style={{ color: '#1A1410' }}>
-                      {ing.name_en}
+                    <span className="text-sm font-medium" style={{ color: 'var(--casa-text)' }}>
+                      {toTitleCase(ing.name_en)}
                     </span>
                     {ing.name_es && ing.name_es !== ing.name_en && (
-                      <span className="text-xs ml-1" style={{ color: '#9B8B70' }}>
-                        / {ing.name_es}
+                      <span className="text-xs ml-1" style={{ color: 'var(--casa-text-faint)' }}>
+                        / {toTitleCase(ing.name_es)}
                       </span>
                     )}
                   </div>
-                  <span className="text-sm" style={{ color: '#6B5B3E' }}>
+                  <span className="text-sm" style={{ color: 'var(--casa-text-muted)' }}>
                     {ing.quantity} {ing.unit}
                   </span>
                 </div>
@@ -205,28 +210,26 @@ export default async function RecipeDetailPage({ params }: PageProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {r.instructions_en && (
             <div>
-              <h2 className="font-semibold mb-3" style={{ color: '#1A1410' }}>
+              <h2 className="font-semibold mb-3" style={{ color: 'var(--casa-text)' }}>
                 Instructions (English)
               </h2>
-              <div
-                className="text-sm whitespace-pre-wrap leading-relaxed"
-                style={{ color: '#1A1410' }}
-              >
-                {r.instructions_en}
-              </div>
+              <ol className="list-decimal list-outside pl-5 space-y-2">
+                {formatInstructions(r.instructions_en).map((step, i) => (
+                  <li key={i} className="text-sm leading-relaxed" style={{ color: 'var(--casa-text)' }}>{step}.</li>
+                ))}
+              </ol>
             </div>
           )}
           {r.instructions_es && (
             <div>
-              <h2 className="font-semibold mb-3" style={{ color: '#1A1410' }}>
+              <h2 className="font-semibold mb-3" style={{ color: 'var(--casa-text)' }}>
                 Instrucciones (Español)
               </h2>
-              <div
-                className="text-sm whitespace-pre-wrap leading-relaxed"
-                style={{ color: '#1A1410' }}
-              >
-                {r.instructions_es}
-              </div>
+              <ol className="list-decimal list-outside pl-5 space-y-2">
+                {formatInstructions(r.instructions_es).map((step, i) => (
+                  <li key={i} className="text-sm leading-relaxed" style={{ color: 'var(--casa-text)' }}>{step}.</li>
+                ))}
+              </ol>
             </div>
           )}
         </div>
@@ -234,7 +237,7 @@ export default async function RecipeDetailPage({ params }: PageProps) {
 
       {/* Feedback */}
       <div>
-        <h2 className="font-semibold mb-3" style={{ color: '#1A1410' }}>
+        <h2 className="font-semibold mb-3" style={{ color: 'var(--casa-text)' }}>
           Feedback History
         </h2>
         {feedback.length > 0 ? (
@@ -242,7 +245,7 @@ export default async function RecipeDetailPage({ params }: PageProps) {
             {feedback.map((fb) => (
               <Card
                 key={fb.id}
-                style={{ border: '1px solid #E8E0D0', backgroundColor: '#FAFAF8' }}
+                style={{ border: '1px solid var(--casa-border)', backgroundColor: 'var(--casa-bg)' }}
               >
                 <CardContent className="pt-4">
                   <div className="flex items-start justify-between">
@@ -262,17 +265,17 @@ export default async function RecipeDetailPage({ params }: PageProps) {
                         </div>
                       )}
                       {fb.feedback_text && (
-                        <p className="text-sm" style={{ color: '#1A1410' }}>
+                        <p className="text-sm" style={{ color: 'var(--casa-text)' }}>
                           {fb.feedback_text}
                         </p>
                       )}
                       {fb.adjustment_type && (
-                        <p className="text-xs mt-1" style={{ color: '#9B8B70' }}>
+                        <p className="text-xs mt-1" style={{ color: 'var(--casa-text-faint)' }}>
                           {fb.adjustment_type}: {fb.adjustment_detail}
                         </p>
                       )}
                     </div>
-                    <time className="text-xs shrink-0 ml-4" style={{ color: '#9B8B70' }}>
+                    <time className="text-xs shrink-0 ml-4" style={{ color: 'var(--casa-text-faint)' }}>
                       {new Date(fb.created_at).toLocaleDateString()}
                     </time>
                   </div>
@@ -281,7 +284,7 @@ export default async function RecipeDetailPage({ params }: PageProps) {
             ))}
           </div>
         ) : (
-          <p className="text-sm" style={{ color: '#9B8B70' }}>
+          <p className="text-sm" style={{ color: 'var(--casa-text-faint)' }}>
             No feedback yet for this recipe.
           </p>
         )}

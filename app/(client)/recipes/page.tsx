@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { Plus, Search, Sparkles, X } from 'lucide-react'
+import { Plus, Search, Sparkles, X, ChevronDown } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -29,6 +29,8 @@ const CATEGORIES = [
 export default function RecipesPage() {
   const { t } = useI18n()
   const [recipes, setRecipes] = useState<Recipe[]>([])
+  const [variants, setVariants] = useState<Map<string, Recipe[]>>(new Map())
+  const [expandedRecipe, setExpandedRecipe] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('all')
@@ -40,9 +42,11 @@ export default function RecipesPage() {
     setLoading(true)
     const supabase = createClient()
 
+    // Fetch only top-level recipes (no parent)
     let query = supabase
       .from('recipes')
       .select('*')
+      .is('parent_recipe_id', null)
       .order('created_at', { ascending: false })
 
     if (category !== 'all') {
@@ -54,7 +58,30 @@ export default function RecipesPage() {
     }
 
     const { data } = await query
-    setRecipes((data as Recipe[]) ?? [])
+    const topLevel = (data as Recipe[]) ?? []
+    setRecipes(topLevel)
+
+    // Fetch variants for these top-level recipes
+    const topLevelIds = topLevel.map((r: Recipe) => r.id)
+    let variantData: Recipe[] = []
+    if (topLevelIds.length > 0) {
+      const { data: variantsResult } = await supabase
+        .from('recipes')
+        .select('*')
+        .in('parent_recipe_id', topLevelIds)
+        .eq('is_active', true)
+      variantData = (variantsResult as Recipe[]) ?? []
+    }
+
+    // Build variant map keyed by parent recipe ID
+    const variantMap = new Map<string, Recipe[]>()
+    for (const v of variantData) {
+      const existing = variantMap.get(v.parent_recipe_id!) ?? []
+      existing.push(v)
+      variantMap.set(v.parent_recipe_id!, existing)
+    }
+    setVariants(variantMap)
+
     setLoading(false)
   }, [category, search])
 
@@ -172,7 +199,27 @@ export default function RecipesPage() {
       ) : recipes.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {recipes.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} language="en" />
+            <div key={recipe.id}>
+              <RecipeCard recipe={recipe} language="en" />
+              {(variants.get(recipe.id)?.length ?? 0) > 0 && (
+                <button
+                  onClick={() => setExpandedRecipe(expandedRecipe === recipe.id ? null : recipe.id)}
+                  className="w-full text-xs py-1.5 flex items-center justify-center gap-1"
+                  style={{ color: 'var(--casa-text-muted)' }}
+                >
+                  <ChevronDown
+                    className={`w-3 h-3 transition-transform ${expandedRecipe === recipe.id ? 'rotate-180' : ''}`}
+                  />
+                  + {variants.get(recipe.id)!.length} variant{variants.get(recipe.id)!.length !== 1 ? 's' : ''}
+                </button>
+              )}
+              {expandedRecipe === recipe.id &&
+                variants.get(recipe.id)?.map((variant) => (
+                  <div key={variant.id} className="ml-4 mt-1">
+                    <RecipeCard recipe={variant} language="en" />
+                  </div>
+                ))}
+            </div>
           ))}
         </div>
       ) : (
