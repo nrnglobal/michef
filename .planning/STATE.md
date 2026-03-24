@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 03-04-PLAN.md
-last_updated: "2026-03-24T01:40:35.380Z"
+stopped_at: Completed 03-03-PLAN.md
+last_updated: "2026-03-24T01:41:00Z"
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 9
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-22)
 ## Current Position
 
 Phase: 03 (ai-features) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Plan: 3 of 5
 | Phase 02 P03 | 128 | 2 tasks | 2 files |
 | Phase 03 P01 | 3 | 2 tasks | 11 files |
 | Phase 03 P04 | 2 | 2 tasks | 3 files |
+| Phase 03 P02 | 3 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,7 @@ Recent decisions affecting current work:
 - [Phase 02]: Fallback confirmed menu_plan query added to visita page to show recipes even without linked visit record
 - [Phase 03]: Test stubs use mock data objects rather than actual HTTP calls — avoids need for server in unit tests; image-resize uses expect(true).toBe(true) because Canvas API unavailable in jsdom
 - [Phase 03]: No prompt caching on URL import: each URL has unique content, caching would not help
+- [Phase 03 P02]: Prompt caching requires anthropic-beta header (prompt-caching-2024-07-31) alongside cache_control on system prompt block; without the header, cache_control is silently ignored
 
 ### Pending Todos
 

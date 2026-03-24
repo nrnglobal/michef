@@ -62,7 +62,7 @@ Plans:
 
 Plans:
 - [x] 03-01-PLAN.md — Foundation: vitest, parent_recipe_id migration, CSS diff vars, test stubs
-- [ ] 03-02-PLAN.md — Recipe generation: Claude Sonnet generate-recipe route + GenerateRecipeModal
+- [x] 03-02-PLAN.md — Recipe generation: Claude Sonnet generate-recipe route + GenerateRecipeModal
 - [ ] 03-03-PLAN.md — Receipt OCR: Claude Haiku extract-receipt route + upload/review components
 - [x] 03-04-PLAN.md — URL import: import-url route + collapsible UrlImportSection on /recipes/new
 - [ ] 03-05-PLAN.md — Recipe adjustment + variants: adjust-recipe route, FeedbackForm, RecipeDiffView, Duplicate, variant grouping
@@ -97,6 +97,6 @@ Phases execute in numeric order: 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Foundation | - | Complete | 2026-03-22 |
 | 2. Menu Planning and Shopping | 4/4 | Complete   | 2026-03-23 |
-| 3. AI Features | 2/5 | In Progress|  |
+| 3. AI Features | 3/5 | In Progress|  |
 | 4. Communication and Finance | 0/TBD | Not started | - |
 | 5. Polish | 0/TBD | Not started | - |
