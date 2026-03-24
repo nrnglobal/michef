@@ -7,12 +7,14 @@ import { createClient } from '@/lib/supabase/client'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Separator } from '@/components/ui/separator'
 import { useI18n } from '@/lib/i18n/config'
+import { toTitleCase, formatDateEs } from '@/lib/utils'
 import type { ShoppingListItem } from '@/lib/types'
 
 export default function ListaPage() {
   const { t } = useI18n()
   const [items, setItems] = useState<ShoppingListItem[]>([])
   const [listId, setListId] = useState<string | null>(null)
+  const [visitDate, setVisitDate] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [showInput, setShowInput] = useState(false)
   const [inputText, setInputText] = useState('')
@@ -21,26 +23,27 @@ export default function ListaPage() {
     async function fetchData() {
       const supabase = createClient()
 
-      // 1. Find next confirmed menu plan
-      const { data: planData } = await supabase
-        .from('menu_plans')
-        .select('id')
-        .eq('status', 'confirmed')
+      // 1. Find next upcoming visit (same source of truth as /visita)
+      const { data: visitData } = await supabase
+        .from('visits')
+        .select('id, visit_date, menu_plan_id')
         .gte('visit_date', new Date().toISOString().split('T')[0])
         .order('visit_date', { ascending: true })
         .limit(1)
         .single()
 
-      if (!planData) {
+      if (!visitData?.menu_plan_id) {
         setLoading(false)
         return
       }
+
+      setVisitDate(visitData.visit_date)
 
       // 2. Find shopping list for that plan
       const { data: listData } = await supabase
         .from('shopping_lists')
         .select('id')
-        .eq('menu_plan_id', planData.id)
+        .eq('menu_plan_id', visitData.menu_plan_id)
         .single()
 
       if (!listData) {
@@ -138,7 +141,7 @@ export default function ListaPage() {
   if (loading) {
     return (
       <div className="max-w-lg mx-auto px-4 py-6 flex items-center justify-center py-16">
-        <p className="text-sm" style={{ color: '#9B8B70' }}>
+        <p className="text-sm" style={{ color: 'var(--casa-text-faint)' }}>
           {t('common.loading')}
         </p>
       </div>
@@ -151,11 +154,11 @@ export default function ListaPage() {
     return (
       <div className="max-w-lg mx-auto px-4 py-6">
         <div className="flex flex-col items-center py-16 text-center">
-          <ShoppingCart className="w-10 h-10 mb-3" style={{ color: '#C4B49A' }} />
-          <p className="font-semibold" style={{ color: '#1A1410' }}>
+          <ShoppingCart className="w-10 h-10 mb-3" style={{ color: 'var(--casa-icon-muted)' }} />
+          <p className="font-semibold" style={{ color: 'var(--casa-text)' }}>
             {t('shopping.emptyList')}
           </p>
-          <p className="text-sm mt-1" style={{ color: '#9B8B70' }}>
+          <p className="text-sm mt-1" style={{ color: 'var(--casa-text-faint)' }}>
             {t('shopping.emptyListBody')}
           </p>
         </div>
@@ -177,12 +180,17 @@ export default function ListaPage() {
     <div className="max-w-lg mx-auto px-4 py-6 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold" style={{ color: '#1A1410' }}>
+        <h1 className="text-xl font-semibold" style={{ color: 'var(--casa-text)' }}>
           Lista de Compras
         </h1>
+        {visitDate && (
+          <p className="text-xs mt-0.5 capitalize" style={{ color: 'var(--casa-text-faint)' }}>
+            {formatDateEs(visitDate)}
+          </p>
+        )}
         <span
           className="text-xs font-medium px-2.5 py-1 rounded-full"
-          style={{ color: '#8B6914', backgroundColor: '#FEF9EC' }}
+          style={{ color: 'var(--casa-primary)', backgroundColor: 'var(--casa-primary-bg)' }}
           aria-live="polite"
         >
           {t('shopping.runningCount', { n: checkedCount, total: items.length })}
@@ -199,7 +207,7 @@ export default function ListaPage() {
             onChange={e => setInputText(e.target.value)}
             placeholder={t('shopping.addItemPlaceholder')}
             className="flex-1 px-3 py-2 rounded-lg border text-sm outline-none focus:ring-2"
-            style={{ borderColor: '#E8E0D0', color: '#1A1410' }}
+            style={{ borderColor: 'var(--casa-border)', color: 'var(--casa-text)' }}
             onKeyDown={e => {
               if (e.key === 'Escape') {
                 setShowInput(false)
@@ -210,7 +218,7 @@ export default function ListaPage() {
           <button
             type="submit"
             className="px-4 py-2 rounded-lg text-sm font-semibold text-white"
-            style={{ backgroundColor: '#8B6914' }}
+            style={{ backgroundColor: 'var(--casa-primary)' }}
           >
             Agregar
           </button>
@@ -223,7 +231,7 @@ export default function ListaPage() {
           {catIdx > 0 && <Separator className="my-2" />}
           <p
             className="text-xs uppercase tracking-wide font-medium py-2 border-b"
-            style={{ color: '#9B8B70', borderColor: '#E8E0D0' }}
+            style={{ color: 'var(--casa-text-faint)', borderColor: 'var(--casa-border)' }}
           >
             {cat}
           </p>
@@ -239,17 +247,17 @@ export default function ListaPage() {
                   onCheckedChange={(checked: boolean) => handleCheck(item.id, checked)}
                   aria-label={`${item.ingredient_name_es}${item.quantity ? `, ${item.quantity}` : ''}${item.unit ? ` ${item.unit}` : ''}`}
                   className="w-6 h-6 shrink-0"
-                  style={{ accentColor: '#8B6914' } as React.CSSProperties}
+                  style={{ accentColor: 'var(--casa-primary)' } as React.CSSProperties}
                 />
                 <div className="flex-1 min-w-0">
                   <p
                     className="text-sm"
-                    style={{ color: item.is_checked ? '#9B8B70' : '#1A1410' }}
+                    style={{ color: item.is_checked ? 'var(--casa-text-faint)' : 'var(--casa-text)' }}
                   >
-                    {item.ingredient_name_es}
+                    {toTitleCase(item.ingredient_name_es)}
                   </p>
                   {(item.quantity || item.unit) && (
-                    <p className="text-xs" style={{ color: '#9B8B70' }}>
+                    <p className="text-xs" style={{ color: 'var(--casa-text-faint)' }}>
                       {item.quantity ? `${item.quantity} ` : ''}{item.unit ?? ''}
                     </p>
                   )}
@@ -263,11 +271,11 @@ export default function ListaPage() {
       {/* Empty state when list exists but no items */}
       {items.length === 0 && listId && (
         <div className="flex flex-col items-center py-16 text-center">
-          <ShoppingCart className="w-10 h-10 mb-3" style={{ color: '#C4B49A' }} />
-          <p className="font-semibold" style={{ color: '#1A1410' }}>
+          <ShoppingCart className="w-10 h-10 mb-3" style={{ color: 'var(--casa-icon-muted)' }} />
+          <p className="font-semibold" style={{ color: 'var(--casa-text)' }}>
             {t('shopping.emptyList')}
           </p>
-          <p className="text-sm mt-1" style={{ color: '#9B8B70' }}>
+          <p className="text-sm mt-1" style={{ color: 'var(--casa-text-faint)' }}>
             {t('shopping.emptyListBody')}
           </p>
         </div>
@@ -279,7 +287,7 @@ export default function ListaPage() {
           type="button"
           onClick={() => setShowInput(s => !s)}
           className="fixed bottom-24 right-4 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-opacity hover:opacity-90"
-          style={{ backgroundColor: '#8B6914' }}
+          style={{ backgroundColor: 'var(--casa-primary)' }}
           aria-label={t('shopping.addItem')}
         >
           <Plus className="w-6 h-6 text-white" />

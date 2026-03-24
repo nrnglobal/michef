@@ -32,7 +32,7 @@ export default async function ClientLayout({
 
   return (
     <I18nProvider initialLanguage="en">
-      <div className="flex h-screen overflow-hidden" style={{ backgroundColor: '#FAFAF8' }}>
+      <div className="flex h-screen overflow-hidden" style={{ backgroundColor: 'var(--casa-bg)' }}>
         <Sidebar userName={userName} />
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-6xl mx-auto px-6 py-8">{children}</div>

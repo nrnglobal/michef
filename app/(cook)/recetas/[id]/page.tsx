@@ -4,6 +4,7 @@ import { ArrowLeft, Clock, Users, Youtube } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { Recipe, Ingredient } from '@/lib/types'
+import { toTitleCase, formatInstructions } from '@/lib/utils'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -28,7 +29,7 @@ export default async function RecetaDetailPage({ params }: PageProps) {
       <Link
         href="/recetas"
         className="flex items-center gap-1.5 text-sm font-medium hover:underline"
-        style={{ color: '#8B6914' }}
+        style={{ color: 'var(--casa-primary)' }}
       >
         <ArrowLeft className="w-4 h-4" />
         Mis Recetas
@@ -36,23 +37,23 @@ export default async function RecetaDetailPage({ params }: PageProps) {
 
       {/* Title + Meta */}
       <div>
-        <h1 className="text-xl font-semibold" style={{ color: '#1A1410' }}>
+        <h1 className="text-xl font-semibold" style={{ color: 'var(--casa-text)' }}>
           {r.title_es}
         </h1>
         {r.description_es && (
-          <p className="text-sm mt-1" style={{ color: '#6B5B3E' }}>
+          <p className="text-sm mt-1" style={{ color: 'var(--casa-text-muted)' }}>
             {r.description_es}
           </p>
         )}
         <div className="flex items-center gap-4 mt-3">
           {r.prep_time_minutes && (
-            <div className="flex items-center gap-1" style={{ color: '#9B8B70' }}>
+            <div className="flex items-center gap-1" style={{ color: 'var(--casa-text-faint)' }}>
               <Clock className="w-4 h-4" />
               <span className="text-sm">{r.prep_time_minutes} min</span>
             </div>
           )}
           {r.servings && (
-            <div className="flex items-center gap-1" style={{ color: '#9B8B70' }}>
+            <div className="flex items-center gap-1" style={{ color: 'var(--casa-text-faint)' }}>
               <Users className="w-4 h-4" />
               <span className="text-sm">
                 {r.servings} porción{r.servings !== 1 ? 'es' : ''}
@@ -78,9 +79,9 @@ export default async function RecetaDetailPage({ params }: PageProps) {
 
       {/* Ingredients */}
       {r.ingredients?.length > 0 && (
-        <Card style={{ border: '1px solid #E8E0D0', backgroundColor: '#FFFFFF' }}>
+        <Card style={{ border: '1px solid var(--casa-border)', backgroundColor: 'var(--casa-surface)' }}>
           <CardHeader>
-            <CardTitle className="text-base" style={{ color: '#1A1410' }}>
+            <CardTitle className="text-base" style={{ color: 'var(--casa-text)' }}>
               Ingredientes
             </CardTitle>
           </CardHeader>
@@ -90,12 +91,12 @@ export default async function RecetaDetailPage({ params }: PageProps) {
                 <div
                   key={idx}
                   className="flex items-center justify-between py-1.5 border-b last:border-0"
-                  style={{ borderColor: '#F0EBE0' }}
+                  style={{ borderColor: 'var(--casa-surface-3)' }}
                 >
-                  <span className="text-sm font-medium" style={{ color: '#1A1410' }}>
-                    {ing.name_es}
+                  <span className="text-sm font-medium" style={{ color: 'var(--casa-text)' }}>
+                    {toTitleCase(ing.name_es)}
                   </span>
-                  <span className="text-sm" style={{ color: '#6B5B3E' }}>
+                  <span className="text-sm" style={{ color: 'var(--casa-text-muted)' }}>
                     {ing.quantity} {ing.unit}
                   </span>
                 </div>
@@ -108,15 +109,14 @@ export default async function RecetaDetailPage({ params }: PageProps) {
       {/* Instructions */}
       {r.instructions_es && (
         <div>
-          <h2 className="font-semibold mb-3" style={{ color: '#1A1410' }}>
+          <h2 className="font-semibold mb-3" style={{ color: 'var(--casa-text)' }}>
             Instrucciones
           </h2>
-          <div
-            className="text-sm whitespace-pre-wrap leading-relaxed"
-            style={{ color: '#1A1410' }}
-          >
-            {r.instructions_es}
-          </div>
+          <ol className="list-decimal list-outside pl-5 space-y-2">
+            {formatInstructions(r.instructions_es).map((step, i) => (
+              <li key={i} className="text-sm leading-relaxed" style={{ color: 'var(--casa-text)' }}>{step}.</li>
+            ))}
+          </ol>
         </div>
       )}
     </div>

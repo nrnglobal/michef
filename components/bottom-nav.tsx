@@ -2,14 +2,13 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, ShoppingCart, BookOpen, MessageSquare } from 'lucide-react'
+import { Home, ShoppingCart, BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const cookNavItems = [
   { labelEs: 'Próxima Visita', href: '/visita', icon: Home },
   { labelEs: 'Lista', href: '/lista', icon: ShoppingCart },
   { labelEs: 'Recetas', href: '/recetas', icon: BookOpen },
-  { labelEs: 'Mensajes', href: '/mensajes', icon: MessageSquare },
 ]
 
 export function BottomNav() {
@@ -19,8 +18,8 @@ export function BottomNav() {
     <nav
       className="fixed bottom-0 left-0 right-0 border-t z-50"
       style={{
-        backgroundColor: '#FFFFFF',
-        borderColor: '#E8E0D0',
+        backgroundColor: 'var(--casa-surface)',
+        borderColor: 'var(--casa-border)',
         paddingBottom: 'env(safe-area-inset-bottom)',
       }}
     >
@@ -38,7 +37,7 @@ export function BottomNav() {
                 isActive ? '' : 'opacity-60'
               )}
               style={{
-                color: isActive ? '#8B6914' : '#4A3B28',
+                color: isActive ? 'var(--casa-primary)' : 'var(--casa-text-dark)',
               }}
             >
               <Icon

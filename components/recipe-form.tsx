@@ -129,14 +129,14 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
     router.refresh()
   }
 
-  const inputStyle = { borderColor: '#E8E0D0' }
+  const inputStyle = { borderColor: 'var(--casa-border)' }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 max-w-3xl">
       {/* Titles */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label style={{ color: '#1A1410' }}>{t('recipeForm.titleEn')}</Label>
+          <Label style={{ color: 'var(--casa-text)' }}>{t('recipeForm.titleEn')}</Label>
           <Input
             value={titleEn}
             onChange={(e) => setTitleEn(e.target.value)}
@@ -146,7 +146,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
           />
         </div>
         <div className="space-y-1.5">
-          <Label style={{ color: '#1A1410' }}>{t('recipeForm.titleEs')}</Label>
+          <Label style={{ color: 'var(--casa-text)' }}>{t('recipeForm.titleEs')}</Label>
           <Input
             value={titleEs}
             onChange={(e) => setTitleEs(e.target.value)}
@@ -160,7 +160,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
       {/* Descriptions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label style={{ color: '#1A1410' }}>{t('recipeForm.descriptionEn')}</Label>
+          <Label style={{ color: 'var(--casa-text)' }}>{t('recipeForm.descriptionEn')}</Label>
           <Textarea
             value={descEn}
             onChange={(e) => setDescEn(e.target.value)}
@@ -170,7 +170,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
           />
         </div>
         <div className="space-y-1.5">
-          <Label style={{ color: '#1A1410' }}>{t('recipeForm.descriptionEs')}</Label>
+          <Label style={{ color: 'var(--casa-text)' }}>{t('recipeForm.descriptionEs')}</Label>
           <Textarea
             value={descEs}
             onChange={(e) => setDescEs(e.target.value)}
@@ -184,7 +184,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
       {/* Category, protein, prep time, servings */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="space-y-1.5">
-          <Label style={{ color: '#1A1410' }}>{t('recipeForm.category')}</Label>
+          <Label style={{ color: 'var(--casa-text)' }}>{t('recipeForm.category')}</Label>
           <Select value={category} onValueChange={(v) => setCategory(v ?? '')} disabled={saving}>
             <SelectTrigger style={inputStyle}>
               <SelectValue placeholder={t('recipeForm.selectCategory')} />
@@ -200,7 +200,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
         </div>
 
         <div className="space-y-1.5">
-          <Label style={{ color: '#1A1410' }}>{t('recipeForm.proteinType')}</Label>
+          <Label style={{ color: 'var(--casa-text)' }}>{t('recipeForm.proteinType')}</Label>
           <Input
             value={proteinType}
             onChange={(e) => setProteinType(e.target.value)}
@@ -211,7 +211,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
         </div>
 
         <div className="space-y-1.5">
-          <Label style={{ color: '#1A1410' }}>{t('recipeForm.prepTime')}</Label>
+          <Label style={{ color: 'var(--casa-text)' }}>{t('recipeForm.prepTime')}</Label>
           <Input
             type="number"
             min="1"
@@ -223,7 +223,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
         </div>
 
         <div className="space-y-1.5">
-          <Label style={{ color: '#1A1410' }}>{t('recipeForm.servings')}</Label>
+          <Label style={{ color: 'var(--casa-text)' }}>{t('recipeForm.servings')}</Label>
           <Input
             type="number"
             min="1"
@@ -238,7 +238,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
       {/* YouTube and Tags */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label style={{ color: '#1A1410' }}>{t('recipeForm.youtubeUrl')}</Label>
+          <Label style={{ color: 'var(--casa-text)' }}>{t('recipeForm.youtubeUrl')}</Label>
           <Input
             type="url"
             value={youtubeUrl}
@@ -249,7 +249,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
           />
         </div>
         <div className="space-y-1.5">
-          <Label style={{ color: '#1A1410' }}>{t('recipeForm.tags')}</Label>
+          <Label style={{ color: 'var(--casa-text)' }}>{t('recipeForm.tags')}</Label>
           <Input
             value={tags}
             onChange={(e) => setTags(e.target.value)}
@@ -263,7 +263,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
       {/* Ingredients */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <Label className="text-base font-semibold" style={{ color: '#1A1410' }}>
+          <Label className="text-base font-semibold" style={{ color: 'var(--casa-text)' }}>
             {t('recipeForm.ingredients')}
           </Label>
           <Button
@@ -272,7 +272,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
             size="sm"
             onClick={addIngredient}
             disabled={saving}
-            style={{ borderColor: '#E8E0D0', color: '#4A3B28' }}
+            style={{ borderColor: 'var(--casa-border)', color: 'var(--casa-text-dark)' }}
           >
             <Plus className="w-3.5 h-3.5 mr-1" />
             {t('recipeForm.addIngredient')}
@@ -284,7 +284,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
             <div
               key={idx}
               className="grid grid-cols-12 gap-2 items-center p-3 rounded-lg"
-              style={{ backgroundColor: '#FAFAF8', border: '1px solid #E8E0D0' }}
+              style={{ backgroundColor: 'var(--casa-bg)', border: '1px solid var(--casa-border)' }}
             >
               <div className="col-span-3">
                 <Input
@@ -363,7 +363,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
       {/* Instructions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label style={{ color: '#1A1410' }}>{t('recipeForm.instructionsEn')}</Label>
+          <Label style={{ color: 'var(--casa-text)' }}>{t('recipeForm.instructionsEn')}</Label>
           <Textarea
             value={instructionsEn}
             onChange={(e) => setInstructionsEn(e.target.value)}
@@ -374,7 +374,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
           />
         </div>
         <div className="space-y-1.5">
-          <Label style={{ color: '#1A1410' }}>{t('recipeForm.instructionsEs')}</Label>
+          <Label style={{ color: 'var(--casa-text)' }}>{t('recipeForm.instructionsEs')}</Label>
           <Textarea
             value={instructionsEs}
             onChange={(e) => setInstructionsEs(e.target.value)}
@@ -391,7 +391,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
         <Button
           type="submit"
           disabled={saving || !category}
-          style={{ backgroundColor: '#8B6914', color: '#FFFFFF' }}
+          style={{ backgroundColor: 'var(--casa-primary)', color: '#FFFFFF' }}
         >
           {saving ? t('recipeForm.saving') : t('recipeForm.save')}
         </Button>
@@ -400,7 +400,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
           variant="outline"
           onClick={() => router.back()}
           disabled={saving}
-          style={{ borderColor: '#E8E0D0', color: '#4A3B28' }}
+          style={{ borderColor: 'var(--casa-border)', color: 'var(--casa-text-dark)' }}
         >
           {t('recipeForm.cancel')}
         </Button>

@@ -109,16 +109,16 @@ export default function RulesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold" style={{ color: '#1A1410' }}>
+          <h1 className="text-2xl font-semibold" style={{ color: 'var(--casa-text)' }}>
             {t('rules.title')}
           </h1>
-          <p className="text-sm mt-0.5" style={{ color: '#6B5B3E' }}>
+          <p className="text-sm mt-0.5" style={{ color: 'var(--casa-text-muted)' }}>
             {t('rules.subtitle')}
           </p>
         </div>
         <Button
           onClick={() => setShowForm(!showForm)}
-          style={{ backgroundColor: '#8B6914', color: '#FFFFFF' }}
+          style={{ backgroundColor: 'var(--casa-primary)', color: 'var(--casa-surface)' }}
           className="gap-1.5"
         >
           <Plus className="w-4 h-4" />
@@ -128,14 +128,14 @@ export default function RulesPage() {
 
       {/* Add Rule Form */}
       {showForm && (
-        <Card style={{ border: '1px solid #E8E0D0', backgroundColor: '#FFFFFF' }}>
+        <Card style={{ border: '1px solid var(--casa-border)', backgroundColor: 'var(--casa-surface)' }}>
           <CardContent className="pt-5">
             <form onSubmit={handleAddRule} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label style={{ color: '#1A1410' }}>{t('rules.ruleType')}</Label>
+                  <Label style={{ color: 'var(--casa-text)' }}>{t('rules.ruleType')}</Label>
                   <Select value={ruleType} onValueChange={(v) => setRuleType(v ?? '')} disabled={saving}>
-                    <SelectTrigger style={{ borderColor: '#E8E0D0' }}>
+                    <SelectTrigger style={{ borderColor: 'var(--casa-border)' }}>
                       <SelectValue placeholder="Select rule type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -150,9 +150,9 @@ export default function RulesPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label style={{ color: '#1A1410' }}>
+                <Label style={{ color: 'var(--casa-text)' }}>
                   {t('rules.definition')}{' '}
-                  <span className="text-xs font-normal" style={{ color: '#9B8B70' }}>
+                  <span className="text-xs font-normal" style={{ color: 'var(--casa-text-faint)' }}>
                     (text or JSON)
                   </span>
                 </Label>
@@ -162,7 +162,7 @@ export default function RulesPage() {
                   placeholder={'No dairy\nor\n{"restriction": "dairy", "reason": "lactose intolerance"}'}
                   rows={4}
                   disabled={saving}
-                  style={{ borderColor: '#E8E0D0' }}
+                  style={{ borderColor: 'var(--casa-border)' }}
                 />
               </div>
 
@@ -170,7 +170,7 @@ export default function RulesPage() {
                 <Button
                   type="submit"
                   disabled={saving || !ruleType}
-                  style={{ backgroundColor: '#8B6914', color: '#FFFFFF' }}
+                  style={{ backgroundColor: 'var(--casa-primary)', color: 'var(--casa-surface)' }}
                 >
                   {saving ? t('rules.saving') : t('rules.save')}
                 </Button>
@@ -178,7 +178,7 @@ export default function RulesPage() {
                   type="button"
                   variant="outline"
                   onClick={() => setShowForm(false)}
-                  style={{ borderColor: '#E8E0D0', color: '#4A3B28' }}
+                  style={{ borderColor: 'var(--casa-border)', color: 'var(--casa-text-dark)' }}
                 >
                   {t('rules.cancel')}
                 </Button>
@@ -195,7 +195,7 @@ export default function RulesPage() {
             <div
               key={i}
               className="h-20 rounded-xl animate-pulse"
-              style={{ backgroundColor: '#E8E0D0' }}
+              style={{ backgroundColor: 'var(--casa-border)' }}
             />
           ))}
         </div>
@@ -214,8 +214,8 @@ export default function RulesPage() {
               <Card
                 key={rule.id}
                 style={{
-                  border: '1px solid #E8E0D0',
-                  backgroundColor: rule.is_active ? '#FFFFFF' : '#FAFAF8',
+                  border: '1px solid var(--casa-border)',
+                  backgroundColor: rule.is_active ? 'var(--casa-surface)' : 'var(--casa-bg)',
                   opacity: rule.is_active ? 1 : 0.6,
                 }}
               >
@@ -234,14 +234,14 @@ export default function RulesPage() {
                           {t(`rules.ruleTypes.${rule.rule_type}`)}
                         </Badge>
                         {!rule.is_active && (
-                          <span className="text-xs" style={{ color: '#9B8B70' }}>
+                          <span className="text-xs" style={{ color: 'var(--casa-text-faint)' }}>
                             {t('rules.inactive')}
                           </span>
                         )}
                       </div>
                       <p
                         className="text-sm whitespace-pre-wrap font-mono"
-                        style={{ color: '#1A1410' }}
+                        style={{ color: 'var(--casa-text)' }}
                       >
                         {displayText}
                       </p>
@@ -254,7 +254,7 @@ export default function RulesPage() {
                       {rule.is_active ? (
                         <ToggleRight
                           className="w-6 h-6"
-                          style={{ color: '#8B6914' }}
+                          style={{ color: 'var(--casa-primary)' }}
                         />
                       ) : (
                         <ToggleLeft
@@ -272,18 +272,18 @@ export default function RulesPage() {
       ) : (
         <div
           className="text-center py-16 rounded-xl border"
-          style={{ borderColor: '#E8E0D0', borderStyle: 'dashed' }}
+          style={{ borderColor: 'var(--casa-border)', borderStyle: 'dashed' }}
         >
-          <p className="text-base font-medium" style={{ color: '#1A1410' }}>
+          <p className="text-base font-medium" style={{ color: 'var(--casa-text)' }}>
             {t('rules.noRules')}
           </p>
-          <p className="text-sm mt-1" style={{ color: '#9B8B70' }}>
+          <p className="text-sm mt-1" style={{ color: 'var(--casa-text-faint)' }}>
             Add dietary restrictions, allergies, and cooking preferences.
           </p>
           <Button
             className="mt-4"
             onClick={() => setShowForm(true)}
-            style={{ backgroundColor: '#8B6914', color: '#FFFFFF' }}
+            style={{ backgroundColor: 'var(--casa-primary)', color: 'var(--casa-surface)' }}
           >
             <Plus className="w-4 h-4 mr-1.5" />
             {t('rules.addRule')}

@@ -8,7 +8,6 @@ import {
   CalendarDays,
   ShoppingCart,
   DollarSign,
-  MessageSquare,
   Settings,
   LogOut,
   ChefHat,
@@ -16,6 +15,7 @@ import {
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { useI18n } from '@/lib/i18n/config'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 const navItems = [
   {
@@ -49,12 +49,6 @@ const navItems = [
     active: false,
   },
   {
-    key: 'nav.messages',
-    href: '/client-messages',
-    icon: MessageSquare,
-    active: false,
-  },
-  {
     key: 'nav.rules',
     href: '/rules',
     icon: Settings,
@@ -81,24 +75,24 @@ export function Sidebar({ userName }: SidebarProps) {
     <aside
       className="w-60 flex flex-col h-full border-r"
       style={{
-        backgroundColor: '#FFFFFF',
-        borderColor: '#E8E0D0',
+        backgroundColor: 'var(--casa-surface)',
+        borderColor: 'var(--casa-border)',
       }}
     >
       {/* Logo */}
       <div
         className="flex items-center gap-3 px-5 py-5 border-b"
-        style={{ borderColor: '#E8E0D0' }}
+        style={{ borderColor: 'var(--casa-border)' }}
       >
         <div
           className="flex items-center justify-center w-8 h-8 rounded-lg"
-          style={{ backgroundColor: '#8B6914' }}
+          style={{ backgroundColor: 'var(--casa-primary)' }}
         >
           <ChefHat className="w-4 h-4 text-white" />
         </div>
         <span
           className="font-semibold text-base tracking-tight"
-          style={{ color: '#1A1410' }}
+          style={{ color: 'var(--casa-text)' }}
         >
           Casa Cook
         </span>
@@ -126,8 +120,8 @@ export function Sidebar({ userName }: SidebarProps) {
                     )}
                     style={
                       isActive
-                        ? { backgroundColor: '#8B6914', color: '#FFFFFF' }
-                        : { color: '#4A3B28' }
+                        ? { backgroundColor: 'var(--casa-primary)', color: 'var(--casa-surface)' }
+                        : { color: 'var(--casa-text-dark)' }
                     }
                   >
                     <Icon className="w-4 h-4 shrink-0" />
@@ -136,7 +130,7 @@ export function Sidebar({ userName }: SidebarProps) {
                 ) : (
                   <div
                     className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm cursor-not-allowed"
-                    style={{ color: '#B8A89A' }}
+                    style={{ color: 'var(--casa-disabled)' }}
                     title="Coming in Phase 2"
                   >
                     <Icon className="w-4 h-4 shrink-0" />
@@ -144,8 +138,8 @@ export function Sidebar({ userName }: SidebarProps) {
                     <span
                       className="ml-auto text-xs px-1.5 py-0.5 rounded"
                       style={{
-                        backgroundColor: '#F5F0E8',
-                        color: '#9B8B70',
+                        backgroundColor: 'var(--casa-surface-2)',
+                        color: 'var(--casa-text-faint)',
                         fontSize: '10px',
                       }}
                     >
@@ -162,18 +156,19 @@ export function Sidebar({ userName }: SidebarProps) {
       {/* User + Logout */}
       <div
         className="px-3 py-4 border-t"
-        style={{ borderColor: '#E8E0D0' }}
+        style={{ borderColor: 'var(--casa-border)' }}
       >
         {userName && (
           <div className="px-3 py-2 mb-1">
-            <p className="text-xs font-medium truncate" style={{ color: '#9B8B70' }}>
+            <p className="text-xs font-medium truncate" style={{ color: 'var(--casa-text-faint)' }}>
               Signed in as
             </p>
-            <p className="text-sm font-semibold truncate" style={{ color: '#1A1410' }}>
+            <p className="text-sm font-semibold truncate" style={{ color: 'var(--casa-text)' }}>
               {userName}
             </p>
           </div>
         )}
+        <ThemeToggle />
         <button
           onClick={handleLogout}
           className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-50 transition-colors"

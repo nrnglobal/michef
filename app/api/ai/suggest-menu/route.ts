@@ -91,8 +91,9 @@ Return JSON only, no markdown. Format:
     })
 
     if (!response.ok) {
+      const errBody = await response.json().catch(() => ({}))
       return Response.json(
-        { error: 'Claude API call failed' },
+        { error: 'Claude API call failed', status: response.status, detail: errBody },
         { status: 502 }
       )
     }

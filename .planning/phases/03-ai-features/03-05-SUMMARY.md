@@ -115,6 +115,16 @@ None - all features are wired to real data sources. The adjust-recipe API calls 
 - Phase 3 is now complete (all 5 plans delivered)
 - Phase 4 (Communication & Finance) can begin: messaging, receipt upload, payment tracking
 
+## Self-Check: PASSED
+
+- FOUND: app/api/ai/adjust-recipe/route.ts
+- FOUND: components/feedback-form.tsx
+- FOUND: components/recipe-diff-view.tsx
+- FOUND: app/(client)/recipes/[id]/recipe-detail-actions.tsx
+- FOUND: .planning/phases/03-ai-features/03-05-SUMMARY.md
+- FOUND commit: f0b9bb7
+- FOUND commit: 3f31120
+
 ---
 *Phase: 03-ai-features*
 *Completed: 2026-03-24*

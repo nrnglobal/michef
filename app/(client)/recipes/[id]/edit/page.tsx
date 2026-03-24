@@ -27,7 +27,7 @@ export default async function EditRecipePage({ params }: PageProps) {
         <Link
           href={`/recipes/${id}`}
           className="flex items-center gap-1.5 text-sm font-medium hover:underline"
-          style={{ color: '#8B6914' }}
+          style={{ color: 'var(--casa-primary)' }}
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Recipe
@@ -35,10 +35,10 @@ export default async function EditRecipePage({ params }: PageProps) {
       </div>
 
       <div>
-        <h1 className="text-2xl font-semibold" style={{ color: '#1A1410' }}>
+        <h1 className="text-2xl font-semibold" style={{ color: 'var(--casa-text)' }}>
           Edit Recipe
         </h1>
-        <p className="text-sm mt-0.5" style={{ color: '#6B5B3E' }}>
+        <p className="text-sm mt-0.5" style={{ color: 'var(--casa-text-muted)' }}>
           Update recipe details and translations.
         </p>
       </div>

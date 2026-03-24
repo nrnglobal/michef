@@ -40,15 +40,15 @@ export function RecipeCard({ recipe, language = 'en' }: RecipeCardProps) {
           !recipe.is_active && 'opacity-50'
         )}
         style={{
-          backgroundColor: '#FFFFFF',
-          borderColor: '#E8E0D0',
+          backgroundColor: 'var(--casa-surface)',
+          borderColor: 'var(--casa-border)',
         }}
       >
         {/* Header */}
         <div className="flex items-start justify-between gap-2 mb-2">
           <h3
             className="font-semibold text-sm leading-snug line-clamp-2 flex-1 group-hover:underline"
-            style={{ color: '#1A1410' }}
+            style={{ color: 'var(--casa-text)' }}
           >
             {title}
           </h3>
@@ -72,7 +72,7 @@ export function RecipeCard({ recipe, language = 'en' }: RecipeCardProps) {
         {description && (
           <p
             className="text-xs line-clamp-2 mb-3"
-            style={{ color: '#6B5B3E' }}
+            style={{ color: 'var(--casa-text-muted)' }}
           >
             {description}
           </p>
@@ -93,7 +93,7 @@ export function RecipeCard({ recipe, language = 'en' }: RecipeCardProps) {
           {recipe.protein_type && (
             <span
               className="text-xs"
-              style={{ color: '#9B8B70' }}
+              style={{ color: 'var(--casa-text-faint)' }}
             >
               {recipe.protein_type}
             </span>
@@ -103,7 +103,7 @@ export function RecipeCard({ recipe, language = 'en' }: RecipeCardProps) {
         {/* Meta */}
         <div
           className="flex items-center gap-4 mt-3 pt-3 border-t"
-          style={{ borderColor: '#F0EBE0' }}
+          style={{ borderColor: 'var(--casa-surface-3)' }}
         >
           {recipe.prep_time_minutes && (
             <div className="flex items-center gap-1" style={{ color: '#9B8B70' }}>
