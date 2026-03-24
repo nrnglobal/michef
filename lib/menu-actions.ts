@@ -183,5 +183,30 @@ export async function deleteMenuPlan(planId: string) {
   }
 
   revalidatePath('/menus')
-  redirect('/menus')
+}
+
+export async function updateMenuPlanDate(planId: string, newDate: string) {
+  if (!newDate) throw new Error('visit_date is required')
+
+  const supabase = await createClient()
+
+  // Check for conflict with another plan on the same date
+  const { data: existing } = await supabase
+    .from('menu_plans')
+    .select('id')
+    .eq('visit_date', newDate)
+    .neq('id', planId)
+    .maybeSingle()
+
+  if (existing) throw new Error('A plan already exists for that date')
+
+  const { error } = await supabase
+    .from('menu_plans')
+    .update({ visit_date: newDate })
+    .eq('id', planId)
+
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/menus')
+  revalidatePath('/menus/' + planId)
 }

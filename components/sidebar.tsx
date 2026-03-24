@@ -34,13 +34,13 @@ const navItems = [
     key: 'nav.menuPlanning',
     href: '/menus',
     icon: CalendarDays,
-    active: false,
+    active: true,
   },
   {
     key: 'nav.shoppingLists',
     href: '/shopping-lists',
     icon: ShoppingCart,
-    active: false,
+    active: true,
   },
   {
     key: 'nav.finances',

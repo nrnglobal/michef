@@ -28,6 +28,7 @@ import {
   removeRecipeFromPlan,
   confirmMenuPlan,
   deleteMenuPlan,
+  updateMenuPlanDate,
 } from '@/lib/menu-actions'
 import { validateMenuPlan } from '@/lib/rules-engine'
 import type { Recipe, CookingRule, MenuPlan } from '@/lib/types'
@@ -74,6 +75,9 @@ export default function MenuPlanPage() {
 
   const [pickerOpen, setPickerOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [isEditingDate, setIsEditingDate] = useState(false)
+  const [dateInput, setDateInput] = useState('')
+  const [isUpdatingDate, setIsUpdatingDate] = useState(false)
   const [warningsOpen, setWarningsOpen] = useState(false)
   const [rationaleOpen, setRationaleOpen] = useState(false)
   const [suggestionRationale, setSuggestionRationale] = useState<string>('')
@@ -251,10 +255,28 @@ export default function MenuPlanPage() {
     startDeleteTransition(async () => {
       try {
         await deleteMenuPlan(planId)
+        router.push('/menus')
       } catch {
-        toast.error("Couldn't save your changes. Try again.")
+        toast.error("Couldn't delete the plan. Try again.")
       }
     })
+  }
+
+  const handleDateSave = async () => {
+    if (!dateInput || dateInput === plan?.visit_date) {
+      setIsEditingDate(false)
+      return
+    }
+    setIsUpdatingDate(true)
+    try {
+      await updateMenuPlanDate(planId, dateInput)
+      await fetchData()
+      setIsEditingDate(false)
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Couldn't update the date.")
+    } finally {
+      setIsUpdatingDate(false)
+    }
   }
 
   if (loading) {
@@ -283,13 +305,49 @@ export default function MenuPlanPage() {
 
   return (
     <div className="space-y-6 pb-32">
-      {/* Date display */}
+      {/* Date display / edit */}
       <div>
-        <h1 className="text-2xl font-semibold" style={{ color: '#1A1410' }}>
-          {formatDate(plan.visit_date)}
-        </h1>
+        {isEditingDate ? (
+          <div className="flex items-center gap-2">
+            <input
+              type="date"
+              value={dateInput}
+              onChange={(e) => setDateInput(e.target.value)}
+              className="border rounded-lg px-3 py-1.5 text-base font-semibold"
+              style={{ borderColor: '#E8E0D0', color: '#1A1410', backgroundColor: '#FFFFFF' }}
+              disabled={isUpdatingDate}
+            />
+            <button
+              type="button"
+              onClick={handleDateSave}
+              disabled={isUpdatingDate}
+              className="px-3 py-1.5 rounded-lg text-sm font-medium text-white"
+              style={{ backgroundColor: '#8B6914' }}
+            >
+              {isUpdatingDate ? 'Saving…' : 'Save'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsEditingDate(false)}
+              className="px-3 py-1.5 rounded-lg text-sm font-medium"
+              style={{ color: '#6B5B3E' }}
+            >
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => { setDateInput(plan.visit_date); setIsEditingDate(true) }}
+            className="text-left group"
+          >
+            <h1 className="text-2xl font-semibold group-hover:underline" style={{ color: '#1A1410' }}>
+              {formatDate(plan.visit_date)}
+            </h1>
+          </button>
+        )}
         <p className="text-sm mt-1" style={{ color: '#6B5B3E' }}>
-          {isConfirmed ? 'Confirmed' : 'Draft'}
+          {isConfirmed ? 'Confirmed' : 'Draft'}{!isEditingDate && <span className="ml-2 text-xs" style={{ color: '#C4B49A' }}>tap date to edit</span>}
         </p>
       </div>
 

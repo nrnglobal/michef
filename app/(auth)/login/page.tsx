@@ -114,7 +114,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   disabled={loading}
-                  style={{ borderColor: '#E8E0D0' }}
+                  style={{ borderColor: '#E8E0D0', color: '#1A1410', backgroundColor: '#FFFFFF' }}
                 />
               </div>
 
@@ -130,7 +130,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={loading}
-                  style={{ borderColor: '#E8E0D0' }}
+                  style={{ borderColor: '#E8E0D0', color: '#1A1410', backgroundColor: '#FFFFFF' }}
                 />
               </div>
 
