@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { RecipeForm } from '@/components/recipe-form'
 import { UrlImportSection } from '@/components/url-import-section'
+import { SpoonacularImportSection } from '@/components/spoonacular-import-section'
 import type { Recipe } from '@/lib/types'
 
 export default function NewRecipePage() {
@@ -34,6 +35,13 @@ export default function NewRecipePage() {
       </div>
 
       <UrlImportSection
+        onImported={(r) => {
+          setImportedRecipe(r)
+          setImportKey((k) => k + 1)
+        }}
+      />
+
+      <SpoonacularImportSection
         onImported={(r) => {
           setImportedRecipe(r)
           setImportKey((k) => k + 1)
