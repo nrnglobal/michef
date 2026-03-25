@@ -58,6 +58,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
   const [prepTime, setPrepTime] = useState(String(recipe?.prep_time_minutes ?? ''))
   const [servings, setServings] = useState(String(recipe?.servings ?? '2'))
   const [youtubeUrl, setYoutubeUrl] = useState(recipe?.youtube_url ?? '')
+  const [imageUrl, setImageUrl] = useState(recipe?.image_url ?? '')
   const [tags, setTags] = useState((recipe?.tags ?? []).join(', '))
   const [instructionsEn, setInstructionsEn] = useState(recipe?.instructions_en ?? '')
   const [instructionsEs, setInstructionsEs] = useState(recipe?.instructions_es ?? '')
@@ -88,7 +89,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
     }
     setTranslating(true)
 
-    // Determine which ingredients need translation (name_es is blank)
+    // Send all ingredients for translation (all positions, preserving indices)
     const ingredientsForApi = ingredients.map((ing) => ({ name_en: ing.name_en }))
 
     try {
@@ -109,18 +110,20 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
       }
 
       const translated = await res.json()
+      console.log('[RecipeForm] translate response:', JSON.stringify(translated))
 
-      // Only populate _es fields that are currently blank
-      if (!titleEs.trim() && translated.title_es) setTitleEs(translated.title_es)
-      if (!descEs.trim() && translated.description_es) setDescEs(translated.description_es)
-      if (!instructionsEs.trim() && translated.instructions_es) setInstructionsEs(translated.instructions_es)
+      // Always overwrite _es fields — user explicitly clicked translate.
+      // Use typeof checks so we assign any non-undefined string (including empty).
+      if (typeof translated.title_es === 'string') setTitleEs(translated.title_es)
+      if (typeof translated.description_es === 'string') setDescEs(translated.description_es)
+      if (typeof translated.instructions_es === 'string') setInstructionsEs(translated.instructions_es)
 
-      // Populate blank ingredient name_es fields
+      // Overwrite all ingredient name_es fields
       if (Array.isArray(translated.ingredient_names_es)) {
         setIngredients((prev) =>
           prev.map((ing, idx) => {
             const translatedName = translated.ingredient_names_es[idx]
-            if (!ing.name_es?.trim() && translatedName) {
+            if (typeof translatedName === 'string') {
               return { ...ing, name_es: translatedName }
             }
             return ing
@@ -152,6 +155,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
       prep_time_minutes: prepTime ? parseInt(prepTime, 10) : null,
       servings: servings ? parseInt(servings, 10) : 2,
       youtube_url: youtubeUrl.trim() || null,
+      image_url: imageUrl.trim() || null,
       tags: tags
         .split(',')
         .map((t) => t.trim())
@@ -291,8 +295,8 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
         </div>
       </div>
 
-      {/* YouTube and Tags */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* YouTube, Image URL, and Tags */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-1.5">
           <Label style={{ color: 'var(--casa-text)' }}>{t('recipeForm.youtubeUrl')}</Label>
           <Input
@@ -300,6 +304,17 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
             value={youtubeUrl}
             onChange={(e) => setYoutubeUrl(e.target.value)}
             placeholder={t('recipeForm.youtubePlaceholder')}
+            disabled={saving}
+            style={inputStyle}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label style={{ color: 'var(--casa-text)' }}>Image URL</Label>
+          <Input
+            type="url"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            placeholder="https://example.com/photo.jpg"
             disabled={saving}
             style={inputStyle}
           />

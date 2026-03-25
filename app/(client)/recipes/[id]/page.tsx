@@ -65,6 +65,17 @@ export default async function RecipeDetailPage({ params }: PageProps) {
       {/* AI actions: Adjust, Duplicate, Feedback */}
       <RecipeDetailActions recipe={r} />
 
+      {/* Recipe image */}
+      {r.image_url && (
+        <div className="relative w-full max-h-72 rounded-xl overflow-hidden" style={{ backgroundColor: 'var(--casa-surface-3)' }}>
+          <img
+            src={r.image_url}
+            alt={r.title_en}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+
       {/* Title + Meta */}
       <div>
         <div className="flex items-start gap-3 mb-2">

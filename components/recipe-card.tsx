@@ -44,6 +44,18 @@ export function RecipeCard({ recipe, language = 'en' }: RecipeCardProps) {
           borderColor: 'var(--casa-border)',
         }}
       >
+        {/* Image thumbnail */}
+        {recipe.image_url && (
+          <div className="relative w-full h-32 mb-3 rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--casa-surface-3)' }}>
+            <img
+              src={recipe.image_url}
+              alt={title}
+              className="w-full h-full object-cover"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+            />
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex items-start justify-between gap-2 mb-2">
           <h3
