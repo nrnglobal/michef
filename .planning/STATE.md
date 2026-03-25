@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-25T05:09:03.938Z"
+last_updated: "2026-03-25T05:10:08.349Z"
 last_activity: 2026-03-25
 progress:
   total_phases: 6
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 11
-  completed_plans: 10
+  completed_plans: 11
 ---
 
 # Project State
@@ -55,6 +55,7 @@ Plan: 2 of 2
 | Phase 03 P03 | 3 | 2 tasks | 5 files |
 | Phase 03 P05 | 5 | 2 tasks | 6 files |
 | Phase 03.1-ux-enhancements-inserted P01 | 12 | 2 tasks | 4 files |
+| Phase 03.1 P02 | 4 | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,8 @@ Recent decisions affecting current work:
 - [Phase 03]: Variant grouping uses two sequential Supabase queries (top-level then variants by parent IDs) rather than recursive query
 - [Phase 03.1-01]: Use var(--casa-diff-del-text/bg) for error/destructive states since no dedicated casa-destructive variable exists
 - [Phase 03.1-01]: Server-side category grouping removed from inventory page.tsx; all filtering now client-side to support tab interactions
+- [Phase 03.1]: addRecipeToMenuPlan returns error object not throws so client can show inline message for duplicate detection
+- [Phase 03.1]: confirmMenuPlan now validates server-side: max 10 recipes throws, min 2 throws (mirrors client limits)
 
 ### Pending Todos
 

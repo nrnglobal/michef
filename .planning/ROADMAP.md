@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation** - Auth, role routing, bilingual data model, recipe library (complete)
 - [x] **Phase 2: Menu Planning and Shopping** - Core workflow: menu creation, AI suggestions, rules validation, shopping list, cook's mobile check-off view (completed 2026-03-23)
 - [x] **Phase 3: AI Features** - Claude API layer: recipe generation, feedback-driven adjustment with diff view, receipt OCR, recipe import from URL (completed 2026-03-24)
-- [ ] **Phase 3.1: UX Enhancements** [INSERTED] - Inventory management, shopping list editing, recipe-to-menu shortcut, menu page fixes (dark mode, date editing, recipe limit)
+- [x] **Phase 3.1: UX Enhancements** [INSERTED] - Inventory management, shopping list editing, recipe-to-menu shortcut, menu page fixes (dark mode, date editing, recipe limit) (completed 2026-03-25)
 - [ ] **Phase 4: Communication and Finance** - Real-time bilingual messaging, per-visit payment records, monthly spending summary
 - [ ] **Phase 5: Polish** - Offline shopping list, export, spending analytics
 
@@ -81,7 +81,7 @@ Plans:
 
 Plans:
 - [x] 03.1-01-PLAN.md — Inventory enhancements: is_staple migration, category tabs, staple toggle/filter, add-to-shopping-list
-- [ ] 03.1-02-PLAN.md — Recipe-to-menu shortcut, menu editor fixes (limit 10, dark mode, date edit), shopping list verification
+- [x] 03.1-02-PLAN.md — Recipe-to-menu shortcut, menu editor fixes (limit 10, dark mode, date edit), shopping list verification
 
 ### Phase 4: Communication and Finance
 **Goal**: Client and cook can communicate across the language barrier in real time, and the client has full visibility into visit costs and payment status
@@ -114,6 +114,6 @@ Phases execute in numeric order: 2 → 3 → 3.1 → 4 → 5
 | 1. Foundation | - | Complete | 2026-03-22 |
 | 2. Menu Planning and Shopping | 4/4 | Complete   | 2026-03-23 |
 | 3. AI Features | 5/5 | Complete    | 2026-03-24 |
-| 3.1. UX Enhancements | 0/2 | Not started | - |
+| 3.1. UX Enhancements | 2/2 | Complete   | 2026-03-25 |
 | 4. Communication and Finance | 0/TBD | Not started | - |
 | 5. Polish | 0/TBD | Not started | - |
