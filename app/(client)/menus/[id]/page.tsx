@@ -9,6 +9,7 @@ import {
   Info,
   Trash2,
   Loader2,
+  Pencil,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
@@ -286,7 +287,7 @@ export default function MenuPlanPage() {
           <div
             key={i}
             className="h-24 rounded-xl animate-pulse"
-            style={{ backgroundColor: '#E8E0D0' }}
+            style={{ backgroundColor: 'var(--casa-border)' }}
           />
         ))}
       </div>
@@ -296,7 +297,7 @@ export default function MenuPlanPage() {
   if (!plan) {
     return (
       <div className="text-center py-16">
-        <p style={{ color: '#9B8B70' }}>Plan not found.</p>
+        <p style={{ color: 'var(--casa-text-faint)' }}>Plan not found.</p>
       </div>
     )
   }
@@ -314,7 +315,7 @@ export default function MenuPlanPage() {
               value={dateInput}
               onChange={(e) => setDateInput(e.target.value)}
               className="border rounded-lg px-3 py-1.5 text-base font-semibold"
-              style={{ borderColor: '#E8E0D0', color: '#1A1410', backgroundColor: '#FFFFFF' }}
+              style={{ borderColor: 'var(--casa-border)', color: 'var(--casa-text)', backgroundColor: 'var(--casa-surface)' }}
               disabled={isUpdatingDate}
             />
             <button
@@ -322,7 +323,7 @@ export default function MenuPlanPage() {
               onClick={handleDateSave}
               disabled={isUpdatingDate}
               className="px-3 py-1.5 rounded-lg text-sm font-medium text-white"
-              style={{ backgroundColor: '#8B6914' }}
+              style={{ backgroundColor: 'var(--casa-primary)' }}
             >
               {isUpdatingDate ? 'Saving…' : 'Save'}
             </button>
@@ -330,7 +331,7 @@ export default function MenuPlanPage() {
               type="button"
               onClick={() => setIsEditingDate(false)}
               className="px-3 py-1.5 rounded-lg text-sm font-medium"
-              style={{ color: '#6B5B3E' }}
+              style={{ color: 'var(--casa-text-muted)' }}
             >
               Cancel
             </button>
@@ -339,22 +340,23 @@ export default function MenuPlanPage() {
           <button
             type="button"
             onClick={() => { setDateInput(plan.visit_date); setIsEditingDate(true) }}
-            className="text-left group"
+            className="text-left group flex items-center gap-2"
           >
-            <h1 className="text-2xl font-semibold group-hover:underline" style={{ color: '#1A1410' }}>
+            <h1 className="text-2xl font-semibold group-hover:underline" style={{ color: 'var(--casa-text)' }}>
               {formatDate(plan.visit_date)}
             </h1>
+            <Pencil className="w-4 h-4 opacity-60 group-hover:opacity-100 transition-opacity" style={{ color: 'var(--casa-text-muted)' }} />
           </button>
         )}
-        <p className="text-sm mt-1" style={{ color: '#6B5B3E' }}>
-          {isConfirmed ? 'Confirmed' : 'Draft'}{!isEditingDate && <span className="ml-2 text-xs" style={{ color: '#C4B49A' }}>tap date to edit</span>}
+        <p className="text-sm mt-1" style={{ color: 'var(--casa-text-muted)' }}>
+          {isConfirmed ? 'Confirmed' : 'Draft'}
         </p>
       </div>
 
       {/* Recipe slots */}
       {isSuggesting ? (
         <div className="space-y-3">
-          <p className="text-sm font-medium" style={{ color: '#6B5B3E' }}>
+          <p className="text-sm font-medium" style={{ color: 'var(--casa-text-muted)' }}>
             Finding the best recipes for this visit...
           </p>
           {Array.from({ length: 3 }).map((_, i) => (
@@ -370,10 +372,10 @@ export default function MenuPlanPage() {
           {selectedRecipes.length === 0 ? (
             <div
               className="text-center py-8 rounded-xl border"
-              style={{ borderColor: '#E8E0D0', borderStyle: 'dashed' }}
+              style={{ borderColor: 'var(--casa-border)', borderStyle: 'dashed' }}
             >
-              <p className="text-sm" style={{ color: '#9B8B70' }}>
-                No recipes selected yet. Add 2–4 recipes to continue.
+              <p className="text-sm" style={{ color: 'var(--casa-text-faint)' }}>
+                No recipes selected yet. Add 2–10 recipes to continue.
               </p>
             </div>
           ) : (
@@ -390,14 +392,14 @@ export default function MenuPlanPage() {
                     key={item.id}
                     className="flex items-center gap-3 p-4 rounded-xl border"
                     style={{
-                      backgroundColor: '#FFFFFF',
-                      borderColor: '#E8E0D0',
+                      backgroundColor: 'var(--casa-surface)',
+                      borderColor: 'var(--casa-border)',
                     }}
                   >
                     <div className="flex-1 min-w-0">
                       <p
                         className="font-medium text-sm leading-snug truncate"
-                        style={{ color: '#1A1410' }}
+                        style={{ color: 'var(--casa-text)' }}
                       >
                         {recipe.title_en}
                       </p>
@@ -414,7 +416,7 @@ export default function MenuPlanPage() {
                         {recipe.prep_time_minutes && (
                           <span
                             className="text-xs"
-                            style={{ color: '#9B8B70' }}
+                            style={{ color: 'var(--casa-text-faint)' }}
                           >
                             {recipe.prep_time_minutes} min
                           </span>
@@ -426,7 +428,7 @@ export default function MenuPlanPage() {
                       onClick={() => handleRemoveRecipe(item.id)}
                       aria-label={`Remove ${recipe.title_en}`}
                       className="p-1.5 rounded-lg hover:bg-red-50 transition-colors"
-                      style={{ color: '#9B8B70' }}
+                      style={{ color: 'var(--casa-text-faint)' }}
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -443,8 +445,8 @@ export default function MenuPlanPage() {
           type="button"
           variant="outline"
           onClick={() => setPickerOpen(true)}
-          disabled={selectedRecipes.length >= 4 || isSuggesting}
-          style={{ borderColor: '#8B6914', color: '#8B6914' }}
+          disabled={selectedRecipes.length >= 10 || isSuggesting}
+          style={{ borderColor: 'var(--casa-primary)', color: 'var(--casa-primary)' }}
         >
           Add recipes
         </Button>
@@ -455,7 +457,7 @@ export default function MenuPlanPage() {
           onClick={handleSuggestMenu}
           disabled={isSuggesting}
           className="gap-1.5"
-          style={{ borderColor: '#E8E0D0', color: '#6B5B3E' }}
+          style={{ borderColor: 'var(--casa-border)', color: 'var(--casa-text-muted)' }}
         >
           {isSuggesting ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -535,7 +537,7 @@ export default function MenuPlanPage() {
       {/* Bottom action bar */}
       <div
         className="fixed bottom-0 left-0 right-0 md:relative md:bottom-auto flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 md:p-0 border-t md:border-t-0"
-        style={{ backgroundColor: '#FFFFFF', borderColor: '#E8E0D0' }}
+        style={{ backgroundColor: 'var(--casa-surface)', borderColor: 'var(--casa-border)' }}
       >
         <button
           type="button"
@@ -553,7 +555,7 @@ export default function MenuPlanPage() {
           onClick={handleConfirm}
           disabled={isConfirming || selectedRecipes.length < 2}
           className="sm:ml-auto min-w-[140px]"
-          style={{ backgroundColor: '#8B6914', color: '#FFFFFF' }}
+          style={{ backgroundColor: 'var(--casa-primary)', color: '#FFFFFF' }}
         >
           {isConfirming ? (
             <>
@@ -572,15 +574,15 @@ export default function MenuPlanPage() {
         onOpenChange={setPickerOpen}
         selectedRecipeIds={selectedRecipeIds}
         onConfirm={handlePickerConfirm}
-        maxRecipes={4}
+        maxRecipes={10}
       />
 
       {/* Delete confirmation dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent style={{ borderColor: '#E8E0D0' }}>
+        <DialogContent style={{ borderColor: 'var(--casa-border)' }}>
           <DialogHeader>
-            <DialogTitle style={{ color: '#1A1410' }}>Delete plan?</DialogTitle>
-            <DialogDescription style={{ color: '#6B5B3E' }}>
+            <DialogTitle style={{ color: 'var(--casa-text)' }}>Delete plan?</DialogTitle>
+            <DialogDescription style={{ color: 'var(--casa-text-muted)' }}>
               This will delete the plan for {plan ? formatDate(plan.visit_date) : ''}. This cannot be undone.
             </DialogDescription>
           </DialogHeader>
@@ -589,7 +591,7 @@ export default function MenuPlanPage() {
               type="button"
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
-              style={{ borderColor: '#E8E0D0' }}
+              style={{ borderColor: 'var(--casa-border)' }}
             >
               Cancel
             </Button>

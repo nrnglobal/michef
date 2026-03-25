@@ -53,7 +53,7 @@ export function RecipePickerModal({
   onOpenChange,
   selectedRecipeIds,
   onConfirm,
-  maxRecipes = 4,
+  maxRecipes = 10,
 }: RecipePickerModalProps) {
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [loading, setLoading] = useState(true)

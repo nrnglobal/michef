@@ -127,6 +127,13 @@ export async function confirmMenuPlan(planId: string) {
 
   const recipeIds = (items ?? []).map((i: { recipe_id: string }) => i.recipe_id)
 
+  if (recipeIds.length > 10) {
+    throw new Error('Maximum 10 recipes per menu plan')
+  }
+  if (recipeIds.length < 2) {
+    throw new Error('Minimum 2 recipes required to confirm')
+  }
+
   // Fetch recipes with ingredients
   const { data: recipes, error: recipesError } = await supabase
     .from('recipes')
