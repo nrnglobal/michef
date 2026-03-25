@@ -98,6 +98,7 @@ None yet.
 | 260324-bve | add Inventory page for Client to track food items on hand so shopping list only shows missing items | 2026-03-24 | 103aebf | [260324-bve-add-inventory-page-for-client-to-track-f](.planning/quick/260324-bve-add-inventory-page-for-client-to-track-f/) |
 | 260324-ccy | client needs ability to edit/remove existing shopping list items | 2026-03-24 | 610dd03 | [260324-ccy-client-needs-ability-to-edit-remove-exis](.planning/quick/260324-ccy-client-needs-ability-to-edit-remove-exis/) |
 | 260325-mrec | link recipe titles on menu detail page to /recipes/[id] for view/edit | 2026-03-25 | d411aac | app/(client)/menus/[id]/page.tsx |
+| 260325-trx | auto-translate blank Spanish recipe fields via Claude Haiku on recipe create/edit | 2026-03-25 | 2e4229f | - |
 
 ### Blockers/Concerns
 
