@@ -99,7 +99,11 @@
     "saving": "Guardando...",
     "cancel": "Cancelar",
     "saveSuccess": "Receta guardada con éxito",
-    "saveError": "Error al guardar la receta. Inténtalo de nuevo."
+    "saveError": "Error al guardar la receta. Inténtalo de nuevo.",
+    "autoTranslate": "Traducir al español automáticamente",
+    "translating": "Traduciendo...",
+    "translateSuccess": "Campos en español rellenados",
+    "translateError": "Error en la traducción. Inténtalo de nuevo."
   },
   "rules": {
     "title": "Reglas de Cocina",

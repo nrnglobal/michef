@@ -99,7 +99,11 @@
     "saving": "Saving...",
     "cancel": "Cancel",
     "saveSuccess": "Recipe saved successfully",
-    "saveError": "Failed to save recipe. Please try again."
+    "saveError": "Failed to save recipe. Please try again.",
+    "autoTranslate": "Auto-translate to Spanish",
+    "translating": "Translating...",
+    "translateSuccess": "Spanish fields populated",
+    "translateError": "Translation failed. Please try again."
   },
   "rules": {
     "title": "Cooking Rules",

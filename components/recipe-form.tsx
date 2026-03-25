@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2, Languages } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -65,6 +65,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
     recipe?.ingredients?.length ? recipe.ingredients : [emptyIngredient()]
   )
   const [saving, setSaving] = useState(false)
+  const [translating, setTranslating] = useState(false)
 
   function addIngredient() {
     setIngredients((prev) => [...prev, emptyIngredient()])
@@ -78,6 +79,61 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
     setIngredients((prev) =>
       prev.map((ing, i) => (i === index ? { ...ing, [field]: value } : ing))
     )
+  }
+
+  async function handleAutoTranslate() {
+    if (!titleEn.trim()) {
+      toast.error('Add an English title before translating')
+      return
+    }
+    setTranslating(true)
+
+    // Determine which ingredients need translation (name_es is blank)
+    const ingredientsForApi = ingredients.map((ing) => ({ name_en: ing.name_en }))
+
+    try {
+      const res = await fetch('/api/ai/translate-recipe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title_en: titleEn.trim(),
+          description_en: descEn.trim(),
+          ingredients: ingredientsForApi,
+          instructions_en: instructionsEn.trim(),
+        }),
+      })
+
+      if (!res.ok) {
+        toast.error(t('recipeForm.translateError'))
+        return
+      }
+
+      const translated = await res.json()
+
+      // Only populate _es fields that are currently blank
+      if (!titleEs.trim() && translated.title_es) setTitleEs(translated.title_es)
+      if (!descEs.trim() && translated.description_es) setDescEs(translated.description_es)
+      if (!instructionsEs.trim() && translated.instructions_es) setInstructionsEs(translated.instructions_es)
+
+      // Populate blank ingredient name_es fields
+      if (Array.isArray(translated.ingredient_names_es)) {
+        setIngredients((prev) =>
+          prev.map((ing, idx) => {
+            const translatedName = translated.ingredient_names_es[idx]
+            if (!ing.name_es?.trim() && translatedName) {
+              return { ...ing, name_es: translatedName }
+            }
+            return ing
+          })
+        )
+      }
+
+      toast.success(t('recipeForm.translateSuccess'))
+    } catch {
+      toast.error(t('recipeForm.translateError'))
+    } finally {
+      setTranslating(false)
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -387,10 +443,10 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
       </div>
 
       {/* Actions */}
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-3">
         <Button
           type="submit"
-          disabled={saving || !category}
+          disabled={saving || translating || !category}
           style={{ backgroundColor: 'var(--casa-primary)', color: '#FFFFFF' }}
         >
           {saving ? t('recipeForm.saving') : t('recipeForm.save')}
@@ -398,8 +454,18 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
         <Button
           type="button"
           variant="outline"
+          onClick={handleAutoTranslate}
+          disabled={saving || translating || !titleEn.trim()}
+          style={{ borderColor: 'var(--casa-border)', color: 'var(--casa-text-dark)' }}
+        >
+          <Languages className="w-4 h-4 mr-1.5" />
+          {translating ? t('recipeForm.translating') : t('recipeForm.autoTranslate')}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
           onClick={() => router.back()}
-          disabled={saving}
+          disabled={saving || translating}
           style={{ borderColor: 'var(--casa-border)', color: 'var(--casa-text-dark)' }}
         >
           {t('recipeForm.cancel')}
