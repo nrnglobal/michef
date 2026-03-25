@@ -9,10 +9,10 @@ export async function POST(request: Request) {
     )
   }
 
-  // Build ingredient list for translation — only include ingredients that have an English name
+  // Build ingredient list for translation — include ALL ingredient positions so the
+  // response array indices align with the form's ingredient array indices.
   const ingredientsToTranslate = (ingredients ?? [])
-    .filter((ing: { name_en: string }) => ing.name_en?.trim())
-    .map((ing: { name_en: string }, idx: number) => `${idx}: ${ing.name_en}`)
+    .map((ing: { name_en: string }, idx: number) => `${idx}: ${ing.name_en?.trim() ?? ''}`)
     .join('\n')
 
   const prompt = `You are a professional culinary translator. Translate the following recipe content from English to Spanish. Return JSON only, no markdown, no extra text.

@@ -13,19 +13,35 @@ export async function POST(request: Request) {
 
   let pageContent: string
   try {
+    // Attempt a direct fetch first. Many sites (e.g. BBC Good Food) allow this.
     const pageResponse = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; MiChef/1.0)',
       },
       signal: AbortSignal.timeout(10000),
     })
-    if (!pageResponse.ok) {
-      return Response.json(
-        { error: 'Could not fetch URL', status: pageResponse.status },
-        { status: 502 }
-      )
+
+    if (pageResponse.ok) {
+      pageContent = await pageResponse.text()
+    } else {
+      // Sites like allrecipes.com use Cloudflare bot protection that returns 403
+      // regardless of User-Agent. Fall back to the Jina AI reader, which renders
+      // the page in a real browser and returns clean markdown.
+      const jinaResponse = await fetch(`https://r.jina.ai/${url}`, {
+        headers: {
+          Accept: 'text/plain',
+          'User-Agent': 'Mozilla/5.0 (compatible; MiChef/1.0)',
+        },
+        signal: AbortSignal.timeout(30000),
+      })
+      if (!jinaResponse.ok) {
+        return Response.json(
+          { error: 'Could not fetch URL', status: jinaResponse.status },
+          { status: 502 }
+        )
+      }
+      pageContent = await jinaResponse.text()
     }
-    pageContent = await pageResponse.text()
   } catch {
     return Response.json({ error: 'Could not fetch URL' }, { status: 502 })
   }

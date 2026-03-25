@@ -159,13 +159,15 @@ export function ShoppingListClient({ listId, items }: Props) {
   const [editForm, setEditForm] = useState<FormState>(emptyForm)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault()
     if (!addForm.ingredient_name_en.trim()) return
     setSaving(true)
+    setError(null)
     const supabase = createClient()
-    await supabase.from('shopping_list_items').insert({
+    const { error: addError } = await supabase.from('shopping_list_items').insert({
       shopping_list_id: listId,
       ingredient_name_en: addForm.ingredient_name_en.trim(),
       ingredient_name_es: addForm.ingredient_name_es.trim() || addForm.ingredient_name_en.trim(),
@@ -175,9 +177,13 @@ export function ShoppingListClient({ listId, items }: Props) {
       is_checked: false,
       is_always_stock: false,
     })
+    setSaving(false)
+    if (addError) {
+      setError('Failed to add item. Please try again.')
+      return
+    }
     setAddForm(emptyForm)
     setShowAddForm(false)
-    setSaving(false)
     router.refresh()
   }
 
@@ -196,8 +202,9 @@ export function ShoppingListClient({ listId, items }: Props) {
     e.preventDefault()
     if (!editForm.ingredient_name_en.trim()) return
     setSaving(true)
+    setError(null)
     const supabase = createClient()
-    await supabase
+    const { error: editError } = await supabase
       .from('shopping_list_items')
       .update({
         ingredient_name_en: editForm.ingredient_name_en.trim(),
@@ -207,17 +214,26 @@ export function ShoppingListClient({ listId, items }: Props) {
         category: editForm.category,
       })
       .eq('id', itemId)
-    setEditingId(null)
     setSaving(false)
+    if (editError) {
+      setError('Failed to save changes. Please try again.')
+      return
+    }
+    setEditingId(null)
     router.refresh()
   }
 
   async function handleDelete(itemId: string) {
     if (!window.confirm('Remove this item from the shopping list?')) return
     setDeleting(itemId)
+    setError(null)
     const supabase = createClient()
-    await supabase.from('shopping_list_items').delete().eq('id', itemId)
+    const { error: deleteError } = await supabase.from('shopping_list_items').delete().eq('id', itemId)
     setDeleting(null)
+    if (deleteError) {
+      setError('Failed to remove item. Please try again.')
+      return
+    }
     router.refresh()
   }
 
@@ -231,6 +247,11 @@ export function ShoppingListClient({ listId, items }: Props) {
 
   return (
     <div className="space-y-4">
+      {error && (
+        <p className="text-sm px-3 py-2 rounded-lg" style={{ color: 'var(--casa-diff-del-text)', backgroundColor: 'var(--casa-diff-del-bg)' }}>
+          {error}
+        </p>
+      )}
       {Object.keys(categoryGroups).sort().map((cat) => (
         <div key={cat}>
           <p
