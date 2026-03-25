@@ -57,6 +57,48 @@ export async function addRecipeToPlan(
   revalidatePath('/menus/' + planId)
 }
 
+export async function addRecipeToMenuPlan(menuPlanId: string, recipeId: string) {
+  const supabase = await createClient()
+
+  // Check if recipe is already on this plan
+  const { data: existing } = await supabase
+    .from('menu_plan_items')
+    .select('id')
+    .eq('menu_plan_id', menuPlanId)
+    .eq('recipe_id', recipeId)
+    .maybeSingle()
+
+  if (existing) {
+    return { error: 'already_on_menu' }
+  }
+
+  // Get current max sort_order for this plan
+  const { data: items } = await supabase
+    .from('menu_plan_items')
+    .select('sort_order')
+    .eq('menu_plan_id', menuPlanId)
+    .order('sort_order', { ascending: false })
+    .limit(1)
+
+  const nextSort = items && items.length > 0 ? items[0].sort_order + 1 : 0
+
+  const { error } = await supabase
+    .from('menu_plan_items')
+    .insert({
+      menu_plan_id: menuPlanId,
+      recipe_id: recipeId,
+      sort_order: nextSort,
+    })
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath('/menus/' + menuPlanId)
+  revalidatePath('/menus')
+  return { success: true }
+}
+
 export async function removeRecipeFromPlan(planId: string, itemId: string) {
   const supabase = await createClient()
 

@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { Sparkles, Copy, MessageSquare } from 'lucide-react'
+import { Sparkles, Copy, MessageSquare, CalendarPlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { FeedbackForm } from '@/components/feedback-form'
@@ -10,6 +10,13 @@ import { RecipeDiffView } from '@/components/recipe-diff-view'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import type { Recipe } from '@/lib/types'
+import { addRecipeToMenuPlan } from '@/lib/menu-actions'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 interface FeedbackPayload {
   rating?: number
@@ -29,6 +36,12 @@ export function RecipeDetailActions({ recipe }: RecipeDetailActionsProps) {
   const [showFeedbackForm, setShowFeedbackForm] = useState(false)
   const [showAdjustOffer, setShowAdjustOffer] = useState(false)
   const lastFeedbackRef = useRef<FeedbackPayload | null>(null)
+
+  const [menuModalOpen, setMenuModalOpen] = useState(false)
+  const [draftMenus, setDraftMenus] = useState<Array<{ id: string; visit_date: string; recipe_count: number }>>([])
+  const [loadingMenus, setLoadingMenus] = useState(false)
+  const [addingToMenu, setAddingToMenu] = useState<string | null>(null)
+  const [menuMessage, setMenuMessage] = useState<string | null>(null)
 
   async function handleAdjust(feedback?: FeedbackPayload) {
     setAdjustLoading(true)
@@ -87,6 +100,47 @@ export function RecipeDetailActions({ recipe }: RecipeDetailActionsProps) {
     }
   }
 
+  async function openMenuModal() {
+    setMenuModalOpen(true)
+    setLoadingMenus(true)
+    setMenuMessage(null)
+    const supabase = createClient()
+    const today = new Date().toISOString().split('T')[0]
+    const { data } = await supabase
+      .from('menu_plans')
+      .select('id, visit_date, menu_plan_items(id)')
+      .eq('status', 'draft')
+      .gte('visit_date', today)
+      .order('visit_date', { ascending: true })
+    const menus = (data ?? []).map((p: any) => ({
+      id: p.id,
+      visit_date: p.visit_date,
+      recipe_count: Array.isArray(p.menu_plan_items) ? p.menu_plan_items.length : 0,
+    }))
+    setDraftMenus(menus)
+    setLoadingMenus(false)
+  }
+
+  async function handleAddToMenu(menuId: string, visitDate: string) {
+    setAddingToMenu(menuId)
+    setMenuMessage(null)
+    const result = await addRecipeToMenuPlan(menuId, recipe.id)
+    if (result.error === 'already_on_menu') {
+      setMenuMessage('Already on this menu')
+    } else if (result.error) {
+      setMenuMessage('Failed to add recipe')
+    } else {
+      const dateStr = new Date(visitDate + 'T12:00:00').toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+      })
+      setMenuMessage(`Added to ${dateStr} menu`)
+      setTimeout(() => setMenuModalOpen(false), 1200)
+    }
+    setAddingToMenu(null)
+  }
+
   return (
     <div className="space-y-4">
       {/* AI action buttons */}
@@ -110,6 +164,16 @@ export function RecipeDetailActions({ recipe }: RecipeDetailActionsProps) {
         >
           <Copy className="w-4 h-4" />
           Duplicate Recipe
+        </Button>
+
+        <Button
+          variant="outline"
+          onClick={openMenuModal}
+          className="gap-1.5"
+          style={{ borderColor: 'var(--casa-border)', color: 'var(--casa-text-dark)' }}
+        >
+          <CalendarPlus className="w-4 h-4" />
+          Add to Menu
         </Button>
 
         {!showFeedbackForm && !showAdjustOffer && (
@@ -189,6 +253,59 @@ export function RecipeDetailActions({ recipe }: RecipeDetailActionsProps) {
           onDiscarded={() => setAdjustedRecipe(null)}
         />
       )}
+
+      {/* Add to Menu modal (D-16–D-20) */}
+      <Dialog open={menuModalOpen} onOpenChange={setMenuModalOpen}>
+        <DialogContent style={{ borderColor: 'var(--casa-border)', backgroundColor: 'var(--casa-surface)' }}>
+          <DialogHeader>
+            <DialogTitle style={{ color: 'var(--casa-text)' }}>Add to Menu</DialogTitle>
+          </DialogHeader>
+          {loadingMenus ? (
+            <p className="text-sm py-4" style={{ color: 'var(--casa-text-muted)' }}>Loading menus...</p>
+          ) : draftMenus.length === 0 ? (
+            <div className="py-6 text-center">
+              <p className="text-sm" style={{ color: 'var(--casa-text-muted)' }}>No draft menus — create one first</p>
+              <a href="/menus" className="text-sm font-medium mt-2 inline-block" style={{ color: 'var(--casa-primary)' }}>
+                Go to Menus
+              </a>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {draftMenus.map((menu) => {
+                const dateStr = new Date(menu.visit_date + 'T12:00:00').toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  month: 'short',
+                  day: 'numeric',
+                })
+                return (
+                  <button
+                    key={menu.id}
+                    type="button"
+                    onClick={() => handleAddToMenu(menu.id, menu.visit_date)}
+                    disabled={addingToMenu === menu.id}
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-lg border text-left transition-colors"
+                    style={{
+                      borderColor: 'var(--casa-border)',
+                      backgroundColor: 'var(--casa-surface)',
+                      color: 'var(--casa-text)',
+                    }}
+                  >
+                    <span className="text-sm font-medium">{dateStr}</span>
+                    <span className="text-xs" style={{ color: 'var(--casa-text-muted)' }}>
+                      {addingToMenu === menu.id ? 'Adding...' : `${menu.recipe_count} recipes`}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
+          {menuMessage && (
+            <p className="text-sm text-center py-2" style={{ color: 'var(--casa-primary)' }}>
+              {menuMessage}
+            </p>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
