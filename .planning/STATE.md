@@ -99,6 +99,7 @@ None yet.
 | 260324-ccy | client needs ability to edit/remove existing shopping list items | 2026-03-24 | 610dd03 | [260324-ccy-client-needs-ability-to-edit-remove-exis](.planning/quick/260324-ccy-client-needs-ability-to-edit-remove-exis/) |
 | 260325-mrec | link recipe titles on menu detail page to /recipes/[id] for view/edit | 2026-03-25 | d411aac | app/(client)/menus/[id]/page.tsx |
 | 260325-trx | auto-translate blank Spanish recipe fields via Claude Haiku on recipe create/edit | 2026-03-25 | 2e4229f | - |
+| 260325-dre | add Spoonacular recipe search and import to /recipes/new page | 2026-03-25 | 8df1174 | [260325-dre-add-spoonacular-recipe-search-and-import](.planning/quick/260325-dre-add-spoonacular-recipe-search-and-import/) |
 
 ### Blockers/Concerns
 
