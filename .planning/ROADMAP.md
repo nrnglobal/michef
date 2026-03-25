@@ -77,7 +77,11 @@ Plans:
   2. Client can add, edit, and remove shopping list items manually
   3. Client can add a recipe to a menu from the recipe detail page without navigating away
   4. Menu editor accepts up to 10 recipes, date field is always visible and editable, all elements render correctly in dark mode
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 03.1-01-PLAN.md — Inventory enhancements: is_staple migration, category tabs, staple toggle/filter, add-to-shopping-list
+- [ ] 03.1-02-PLAN.md — Recipe-to-menu shortcut, menu editor fixes (limit 10, dark mode, date edit), shopping list verification
 
 ### Phase 4: Communication and Finance
 **Goal**: Client and cook can communicate across the language barrier in real time, and the client has full visibility into visit costs and payment status
@@ -103,13 +107,13 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 2 → 3 → 4 → 5
+Phases execute in numeric order: 2 → 3 → 3.1 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | - | Complete | 2026-03-22 |
 | 2. Menu Planning and Shopping | 4/4 | Complete   | 2026-03-23 |
 | 3. AI Features | 5/5 | Complete    | 2026-03-24 |
-| 3.1. UX Enhancements | 0/TBD | Not started | - |
+| 3.1. UX Enhancements | 0/2 | Not started | - |
 | 4. Communication and Finance | 0/TBD | Not started | - |
 | 5. Polish | 0/TBD | Not started | - |
