@@ -15,6 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation** - Auth, role routing, bilingual data model, recipe library (complete)
 - [x] **Phase 2: Menu Planning and Shopping** - Core workflow: menu creation, AI suggestions, rules validation, shopping list, cook's mobile check-off view (completed 2026-03-23)
 - [x] **Phase 3: AI Features** - Claude API layer: recipe generation, feedback-driven adjustment with diff view, receipt OCR, recipe import from URL (completed 2026-03-24)
+- [ ] **Phase 3.1: UX Enhancements** [INSERTED] - Inventory management, shopping list editing, recipe-to-menu shortcut, menu page fixes (dark mode, date editing, recipe limit)
 - [ ] **Phase 4: Communication and Finance** - Real-time bilingual messaging, per-visit payment records, monthly spending summary
 - [ ] **Phase 5: Polish** - Offline shopping list, export, spending analytics
 
@@ -67,6 +68,17 @@ Plans:
 - [x] 03-04-PLAN.md — URL import: import-url route + collapsible UrlImportSection on /recipes/new
 - [x] 03-05-PLAN.md — Recipe adjustment + variants: adjust-recipe route, FeedbackForm, RecipeDiffView, Duplicate, variant grouping
 
+### Phase 3.1: UX Enhancements [INSERTED]
+**Goal**: Polish the core client workflow — inventory is fully manageable with categories and shopping list integration, shopping lists support full CRUD, clients can add recipes to a menu directly from the recipe detail page, and the menu editor works correctly for up to 10 recipes with dark mode fixed
+**Depends on**: Phase 3
+**Requirements**: UX-01, UX-02, UX-03, UX-04
+**Success Criteria** (what must be TRUE):
+  1. Client can add, edit, and remove inventory items categorized under Fridge / Pantry / Spices, view them in tabs with a "Show All" option, star-mark staples, filter by staples, and add any item directly to the shopping list
+  2. Client can add, edit, and remove shopping list items manually
+  3. Client can add a recipe to a menu from the recipe detail page without navigating away
+  4. Menu editor accepts up to 10 recipes, date field is always visible and editable, all elements render correctly in dark mode
+**Plans**: TBD
+
 ### Phase 4: Communication and Finance
 **Goal**: Client and cook can communicate across the language barrier in real time, and the client has full visibility into visit costs and payment status
 **Depends on**: Phase 3
@@ -98,5 +110,6 @@ Phases execute in numeric order: 2 → 3 → 4 → 5
 | 1. Foundation | - | Complete | 2026-03-22 |
 | 2. Menu Planning and Shopping | 4/4 | Complete   | 2026-03-23 |
 | 3. AI Features | 5/5 | Complete    | 2026-03-24 |
+| 3.1. UX Enhancements | 0/TBD | Not started | - |
 | 4. Communication and Finance | 0/TBD | Not started | - |
 | 5. Polish | 0/TBD | Not started | - |
