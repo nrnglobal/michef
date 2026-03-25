@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useTransition } from 'react'
+import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import {
   X,
@@ -397,12 +398,13 @@ export default function MenuPlanPage() {
                     }}
                   >
                     <div className="flex-1 min-w-0">
-                      <p
-                        className="font-medium text-sm leading-snug truncate"
-                        style={{ color: 'var(--casa-text)' }}
+                      <Link
+                        href={`/recipes/${recipe.id}`}
+                        className="font-medium text-sm leading-snug truncate block hover:underline"
+                        style={{ color: 'var(--casa-primary)' }}
                       >
                         {recipe.title_en}
-                      </p>
+                      </Link>
                       <div className="flex items-center gap-2 mt-1">
                         <span
                           className="text-xs px-1.5 py-0.5 rounded-full font-medium"
