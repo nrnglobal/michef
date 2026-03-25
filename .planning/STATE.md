@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 03-05-PLAN.md
-last_updated: "2026-03-24T02:01:28.259Z"
+last_updated: "2026-03-25T05:09:03.938Z"
+last_activity: 2026-03-25
 progress:
-  total_phases: 5
+  total_phases: 6
   completed_phases: 2
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 11
+  completed_plans: 10
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** The cook arrives prepared — with a confirmed menu in Spanish, a ready-to-check shopping list, and no language barrier between her and the household.
-**Current focus:** Phase 03 — ai-features
+**Current focus:** Phase 03.1 — ux-enhancements-inserted
 
 ## Current Position
 
-Phase: 4
-Plan: Not started
+Phase: 03.1 (ux-enhancements-inserted) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Plan: Not started
 | Phase 03 P02 | 3 | 2 tasks | 5 files |
 | Phase 03 P03 | 3 | 2 tasks | 5 files |
 | Phase 03 P05 | 5 | 2 tasks | 6 files |
+| Phase 03.1-ux-enhancements-inserted P01 | 12 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -80,6 +81,8 @@ Recent decisions affecting current work:
 - [Phase 03]: Recipe detail page stays server component; AI interactivity extracted to RecipeDetailActions client component passed data via props
 - [Phase 03]: Inline diffIngredients/diffInstructions — no diff library needed for simple ingredient/instruction comparison
 - [Phase 03]: Variant grouping uses two sequential Supabase queries (top-level then variants by parent IDs) rather than recursive query
+- [Phase 03.1-01]: Use var(--casa-diff-del-text/bg) for error/destructive states since no dedicated casa-destructive variable exists
+- [Phase 03.1-01]: Server-side category grouping removed from inventory page.tsx; all filtering now client-side to support tab interactions
 
 ### Pending Todos
 
@@ -100,4 +103,4 @@ None yet.
 
 ## Session Continuity
 
-Last activity: 2026-03-24 - Completed quick task 260324-ccy: client needs ability to edit/remove existing shopping list items
+Last activity: 2026-03-25

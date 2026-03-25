@@ -80,7 +80,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 03.1-01-PLAN.md — Inventory enhancements: is_staple migration, category tabs, staple toggle/filter, add-to-shopping-list
+- [x] 03.1-01-PLAN.md — Inventory enhancements: is_staple migration, category tabs, staple toggle/filter, add-to-shopping-list
 - [ ] 03.1-02-PLAN.md — Recipe-to-menu shortcut, menu editor fixes (limit 10, dark mode, date edit), shopping list verification
 
 ### Phase 4: Communication and Finance
