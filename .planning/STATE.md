@@ -100,6 +100,7 @@ None yet.
 | 260325-mrec | link recipe titles on menu detail page to /recipes/[id] for view/edit | 2026-03-25 | d411aac | app/(client)/menus/[id]/page.tsx |
 | 260325-trx | auto-translate blank Spanish recipe fields via Claude Haiku on recipe create/edit | 2026-03-25 | 2e4229f | - |
 | 260325-dre | add Spoonacular recipe search and import to /recipes/new page | 2026-03-25 | 8df1174 | [260325-dre-add-spoonacular-recipe-search-and-import](.planning/quick/260325-dre-add-spoonacular-recipe-search-and-import/) |
+| 260325-eue | add image support to recipes with image_url column, card thumbnail, detail hero, form input, and auto-population from Spoonacular and URL import | 2026-03-25 | e8036d4 | [260325-eue-add-image-support-to-recipes-with-image-](.planning/quick/260325-eue-add-image-support-to-recipes-with-image-/) |
 
 ### Blockers/Concerns
 
