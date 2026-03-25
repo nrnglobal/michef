@@ -26,6 +26,7 @@ export interface Recipe {
   instructions_en?: string
   instructions_es?: string
   youtube_url?: string
+  image_url?: string
   category: string
   protein_type?: string
   prep_time_minutes?: number

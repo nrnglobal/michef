@@ -98,6 +98,7 @@ export async function GET(request: Request) {
       instructions_en,
       instructions_es: '',
       tags: (dishTypes as string[]).slice(0, 5),
+      image_url: data.image ?? '',
     }
 
     return Response.json(mapped)

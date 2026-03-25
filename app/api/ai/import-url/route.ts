@@ -46,6 +46,13 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Could not fetch URL' }, { status: 502 })
   }
 
+  // Extract og:image from HTML for image_url
+  let ogImage = ''
+  const ogMatch = pageContent.match(/<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["']/i)
+  if (ogMatch?.[1]) {
+    ogImage = ogMatch[1]
+  }
+
   const truncated = pageContent.slice(0, 50000)
 
   try {
@@ -62,7 +69,7 @@ export async function POST(request: Request) {
         messages: [
           {
             role: 'user',
-            content: `Extract a recipe from the following web page HTML. Return JSON only, no markdown fences. If you cannot find a recipe, return {"error": "no recipe found"}. If some fields are unclear, make your best guess and leave unclear fields as empty strings.\n\nFormat:\n{\n  "title_en": "English title",\n  "title_es": "Spanish translation of title",\n  "description_en": "Brief English description",\n  "description_es": "Brief Spanish description",\n  "category": "one of: beef, chicken, seafood, veggies, snacks, carbs, soups, salads, other",\n  "protein_type": "main protein or empty string",\n  "prep_time_minutes": 30,\n  "servings": 4,\n  "tags": ["tag1", "tag2"],\n  "ingredients": [{"name_en":"ingredient","name_es":"Spanish name","quantity":"100","unit":"g","category":"produce"}],\n  "instructions_en": "Step 1: ...",\n  "instructions_es": "Paso 1: ..."\n}\n\nWeb page content:\n${truncated}`,
+            content: `Extract a recipe from the following web page HTML. Return JSON only, no markdown fences. If you cannot find a recipe, return {"error": "no recipe found"}. If some fields are unclear, make your best guess and leave unclear fields as empty strings.\n\nFormat:\n{\n  "title_en": "English title",\n  "title_es": "Spanish translation of title",\n  "description_en": "Brief English description",\n  "description_es": "Brief Spanish description",\n  "category": "one of: beef, chicken, seafood, veggies, snacks, carbs, soups, salads, other",\n  "protein_type": "main protein or empty string",\n  "prep_time_minutes": 30,\n  "servings": 4,\n  "tags": ["tag1", "tag2"],\n  "image_url": "URL of recipe image if visible",\n  "ingredients": [{"name_en":"ingredient","name_es":"Spanish name","quantity":"100","unit":"g","category":"produce"}],\n  "instructions_en": "Step 1: ...",\n  "instructions_es": "Paso 1: ..."\n}\n\nWeb page content:\n${truncated}`,
           },
         ],
       }),
@@ -80,6 +87,10 @@ export async function POST(request: Request) {
     const text = data.content?.[0]?.text ?? ''
     const clean = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim()
     const parsed = JSON.parse(clean)
+
+    if (ogImage && !parsed.image_url) {
+      parsed.image_url = ogImage
+    }
 
     if (parsed.error) {
       return Response.json(
