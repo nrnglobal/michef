@@ -128,4 +128,5 @@ export interface FridgeStaple {
   notes_es?: string
   category?: string
   is_active: boolean
+  is_staple?: boolean
 }
