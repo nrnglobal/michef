@@ -57,7 +57,13 @@ export default function RecipesPage() {
       query = query.ilike('title_en', `%${search.trim()}%`)
     }
 
-    const { data } = await query
+    const { data, error } = await query
+    if (error) {
+      console.error('Recipe query failed:', error.message)
+      setRecipes([])
+      setLoading(false)
+      return
+    }
     const topLevel = (data as Recipe[]) ?? []
     setRecipes(topLevel)
 
