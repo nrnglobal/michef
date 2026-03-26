@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Trash2, Pencil, Check, X, Star, ShoppingCart, Languages } from 'lucide-react'
+import { Plus, Trash2, Pencil, Check, X, Star, ShoppingCart, Languages, FileSpreadsheet } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
@@ -36,6 +36,18 @@ const emptyForm: FormState = {
   category: 'Other',
   source: '',
   brand: '',
+}
+
+interface ImportRow {
+  item_name_en: string
+  item_name_es: string
+  quantity: string
+  category: string
+  source: string
+  brand: string
+  is_staple: boolean
+  isDuplicate?: boolean
+  existingId?: string
 }
 
 interface Props {
@@ -276,6 +288,15 @@ export function InventoryClient({ items }: Props) {
   const [shoppingSuccess, setShoppingSuccess] = useState<string | null>(null)
   const [translating, setTranslating] = useState(false)
 
+  // ── Google Sheets import state ──────────────────────────────────────────
+  const [showImport, setShowImport] = useState(false)
+  const [sheetUrl, setSheetUrl] = useState('')
+  const [importLoading, setImportLoading] = useState(false)
+  const [importError, setImportError] = useState<string | null>(null)
+  const [importedItems, setImportedItems] = useState<ImportRow[] | null>(null)
+  const [duplicateDecisions, setDuplicateDecisions] = useState<Record<string, 'skip' | 'update'>>({})
+  const [importSaving, setImportSaving] = useState(false)
+
   // ── Autocomplete suggestions ────────────────────────────────────────────
   const addSuggestions = addForm.item_name_en.length >= 1
     ? (groceryItems as GroceryItem[])
@@ -328,6 +349,104 @@ export function InventoryClient({ items }: Props) {
     } finally {
       setTranslating(false)
     }
+  }
+
+  // ── Google Sheets import handlers ──────────────────────────────────────
+  async function handleFetchSheet() {
+    setImportError(null)
+    setImportedItems(null)
+    if (!sheetUrl.trim()) return
+    setImportLoading(true)
+    try {
+      const res = await fetch('/api/inventory/import-sheets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: sheetUrl }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setImportError(data.error || 'Import failed')
+        setImportLoading(false)
+        return
+      }
+      // Check for duplicates against existing items (per D-22)
+      const existingByName = new Map(
+        items.map(item => [item.item_name_en.toLowerCase(), item.id])
+      )
+      const rows: ImportRow[] = data.items.map((item: ImportRow) => {
+        const key = item.item_name_en.toLowerCase()
+        return {
+          ...item,
+          isDuplicate: existingByName.has(key),
+          existingId: existingByName.get(key) ?? undefined,
+        }
+      })
+      setImportedItems(rows)
+    } catch {
+      setImportError('Import failed. Please try again.')
+    } finally {
+      setImportLoading(false)
+    }
+  }
+
+  async function handleConfirmImport() {
+    if (!importedItems) return
+    setImportSaving(true)
+    const supabase = createClient()
+    let added = 0, updated = 0, skipped = 0
+
+    for (const row of importedItems) {
+      if (row.isDuplicate) {
+        const decision = duplicateDecisions[row.item_name_en] ?? 'skip'
+        if (decision === 'skip') {
+          skipped++
+          continue
+        }
+        // Update existing item
+        const { error } = await supabase
+          .from('fridge_staples')
+          .update({
+            item_name_es: row.item_name_es || undefined,
+            quantity: row.quantity || undefined,
+            category: row.category,
+            source: row.source || undefined,
+            brand: row.brand || undefined,
+            is_staple: row.is_staple,
+          })
+          .eq('id', row.existingId!)
+        if (!error) updated++
+      } else {
+        // Insert new item
+        const { error } = await supabase
+          .from('fridge_staples')
+          .insert({
+            item_name_en: row.item_name_en,
+            item_name_es: row.item_name_es || row.item_name_en,
+            quantity: row.quantity || null,
+            category: row.category,
+            source: row.source || null,
+            brand: row.brand || null,
+            is_staple: row.is_staple,
+            is_active: true,
+          })
+        if (!error) added++
+      }
+    }
+
+    // Build result message
+    const parts = []
+    if (added > 0) parts.push(`${added} items added`)
+    if (updated > 0) parts.push(`${updated} updated`)
+    if (skipped > 0) parts.push(`${skipped} skipped`)
+    toast.success(parts.join(', ') + '.')
+
+    // Reset import state
+    setShowImport(false)
+    setSheetUrl('')
+    setImportedItems(null)
+    setDuplicateDecisions({})
+    setImportSaving(false)
+    router.refresh()
   }
 
   // ── Filtered + grouped items ───────────────────────────────────────────────
@@ -700,15 +819,124 @@ export function InventoryClient({ items }: Props) {
           translating={translating}
         />
       ) : (
-        <button
-          type="button"
-          onClick={() => setShowAddForm(true)}
-          className="flex items-center gap-2 text-sm font-medium"
-          style={{ color: 'var(--casa-primary)' }}
-        >
-          <Plus className="w-4 h-4" />
-          Add item
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowAddForm(true)}
+            className="flex items-center gap-2 text-sm font-medium"
+            style={{ color: 'var(--casa-primary)' }}
+          >
+            <Plus className="w-4 h-4" />
+            Add item
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowImport(!showImport)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium"
+            style={{
+              border: '1px solid var(--casa-border)',
+              color: 'var(--casa-primary)',
+              backgroundColor: 'var(--casa-surface)',
+            }}
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            Import from Sheets
+          </button>
+        </div>
+      )}
+
+      {/* Google Sheets import panel */}
+      {showImport && (
+        <div className="p-4 rounded-lg border space-y-3" style={{ borderColor: 'var(--casa-border)', backgroundColor: 'var(--casa-surface)' }}>
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium" style={{ color: 'var(--casa-text)' }}>
+              Google Sheets share URL
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="url"
+                value={sheetUrl}
+                onChange={(e) => setSheetUrl(e.target.value)}
+                placeholder="https://docs.google.com/spreadsheets/d/..."
+                className="flex-1 px-3 py-2 rounded-lg border text-sm outline-none focus:ring-2"
+                style={{ borderColor: 'var(--casa-border)', color: 'var(--casa-text)', backgroundColor: 'var(--casa-bg)', minHeight: '44px' }}
+              />
+              <button
+                type="button"
+                onClick={handleFetchSheet}
+                disabled={importLoading || !sheetUrl.trim()}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white whitespace-nowrap"
+                style={{ backgroundColor: 'var(--casa-primary)' }}
+              >
+                {importLoading ? 'Fetching...' : 'Fetch Sheet'}
+              </button>
+            </div>
+            <p className="text-xs" style={{ color: 'var(--casa-text-faint)' }}>
+              Sheet must be shared with &quot;Anyone with the link&quot;.{' '}
+              <a href="/templates/inventory-template.csv" download className="underline" style={{ color: 'var(--casa-primary)' }}>
+                Download template
+              </a>
+            </p>
+          </div>
+
+          {importError && (
+            <p className="text-sm" style={{ color: 'var(--casa-diff-del-text)' }}>{importError}</p>
+          )}
+
+          {importedItems && (
+            <div className="space-y-2">
+              <p className="text-sm font-medium" style={{ color: 'var(--casa-text)' }}>
+                Found {importedItems.length} items.{' '}
+                {importedItems.filter(r => r.isDuplicate).length > 0 &&
+                  `${importedItems.filter(r => r.isDuplicate).length} duplicates detected.`}
+              </p>
+
+              {/* Show duplicate items with skip/update choices */}
+              {importedItems.filter(r => r.isDuplicate).map(row => (
+                <div key={row.item_name_en} className="flex items-center justify-between p-2 rounded-lg border text-sm" style={{ borderColor: 'var(--casa-border)' }}>
+                  <span style={{ color: 'var(--casa-text)' }}>{row.item_name_en}</span>
+                  <div className="flex gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setDuplicateDecisions(d => ({ ...d, [row.item_name_en]: 'skip' }))}
+                      className="px-2 py-1 rounded text-xs font-medium"
+                      style={{
+                        backgroundColor: duplicateDecisions[row.item_name_en] === 'skip' || !duplicateDecisions[row.item_name_en]
+                          ? 'var(--casa-surface-3)' : 'var(--casa-surface)',
+                        color: 'var(--casa-text-muted)',
+                      }}
+                    >
+                      Skip
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDuplicateDecisions(d => ({ ...d, [row.item_name_en]: 'update' }))}
+                      className="px-2 py-1 rounded text-xs font-medium"
+                      style={{
+                        backgroundColor: duplicateDecisions[row.item_name_en] === 'update'
+                          ? 'var(--casa-primary-bg)' : 'var(--casa-surface)',
+                        color: duplicateDecisions[row.item_name_en] === 'update'
+                          ? 'var(--casa-primary)' : 'var(--casa-text-muted)',
+                      }}
+                    >
+                      Update
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              <button
+                type="button"
+                onClick={handleConfirmImport}
+                disabled={importSaving}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white"
+                style={{ backgroundColor: 'var(--casa-primary)' }}
+              >
+                {importSaving ? 'Importing...' : 'Confirm Import'}
+              </button>
+            </div>
+          )}
+        </div>
       )}
     </div>
   )
