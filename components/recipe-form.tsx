@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Trash2, Languages } from 'lucide-react'
+import { Plus, Trash2, Languages, Camera } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -18,6 +18,28 @@ import { createClient } from '@/lib/supabase/client'
 import { useI18n } from '@/lib/i18n/config'
 import type { Recipe, Ingredient } from '@/lib/types'
 import { toast } from 'sonner'
+
+async function resizeImageToLimit(file: File, maxBytes = 5 * 1024 * 1024): Promise<Blob> {
+  return new Promise((resolve) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      let { width, height } = img
+      const scale = Math.sqrt(maxBytes / file.size)
+      if (scale < 1) {
+        width = Math.floor(width * scale)
+        height = Math.floor(height * scale)
+      }
+      const canvas = document.createElement('canvas')
+      canvas.width = width
+      canvas.height = height
+      canvas.getContext('2d')!.drawImage(img, 0, 0, width, height)
+      URL.revokeObjectURL(url)
+      canvas.toBlob((blob) => resolve(blob!), 'image/jpeg', 0.85)
+    }
+    img.src = url
+  })
+}
 
 const CATEGORIES = [
   'beef',
@@ -67,6 +89,9 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
   )
   const [saving, setSaving] = useState(false)
   const [translating, setTranslating] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [imagePreview, setImagePreview] = useState<string>(recipe?.image_url ?? '')
+  const [uploadPathKey] = useState(() => crypto.randomUUID())
 
   function addIngredient() {
     setIngredients((prev) => [...prev, emptyIngredient()])
@@ -80,6 +105,30 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
     setIngredients((prev) =>
       prev.map((ing, i) => (i === index ? { ...ing, [field]: value } : ing))
     )
+  }
+
+  async function handleImageUpload(file: File) {
+    setUploading(true)
+    try {
+      const resized = await resizeImageToLimit(file)
+      const supabase = createClient()
+      const path = `recipe-images/${uploadPathKey}/${Date.now()}.jpg`
+      const { data, error } = await supabase.storage
+        .from('receipts')
+        .upload(path, resized, { contentType: 'image/jpeg', upsert: true })
+      if (error) {
+        toast.error('Image upload failed. Try again or skip the image.')
+        return
+      }
+      const { data: urlData } = supabase.storage.from('receipts').getPublicUrl(data.path)
+      const publicUrl = urlData.publicUrl
+      setImageUrl(publicUrl)
+      setImagePreview(publicUrl)
+    } catch {
+      toast.error('Image upload failed. Try again or skip the image.')
+    } finally {
+      setUploading(false)
+    }
   }
 
   async function handleAutoTranslate() {
@@ -295,8 +344,8 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
         </div>
       </div>
 
-      {/* YouTube, Image URL, and Tags */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* YouTube and Tags */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <Label style={{ color: 'var(--casa-text)' }}>{t('recipeForm.youtubeUrl')}</Label>
           <Input
@@ -304,17 +353,6 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
             value={youtubeUrl}
             onChange={(e) => setYoutubeUrl(e.target.value)}
             placeholder={t('recipeForm.youtubePlaceholder')}
-            disabled={saving}
-            style={inputStyle}
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label style={{ color: 'var(--casa-text)' }}>Image URL</Label>
-          <Input
-            type="url"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            placeholder="https://example.com/photo.jpg"
             disabled={saving}
             style={inputStyle}
           />
@@ -329,6 +367,84 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
             style={inputStyle}
           />
         </div>
+      </div>
+
+      {/* Recipe Photo */}
+      <div className="space-y-1.5">
+        <Label style={{ color: 'var(--casa-text)' }}>Recipe Photo</Label>
+        {imagePreview ? (
+          <div className="flex items-start gap-3">
+            <img
+              src={imagePreview}
+              alt="Recipe"
+              className="rounded-lg object-cover"
+              style={{ width: '160px', height: '120px' }}
+            />
+            <div className="flex flex-col gap-2">
+              <label
+                className="px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer text-center"
+                style={{
+                  border: '1px solid var(--casa-border)',
+                  color: 'var(--casa-text)',
+                  backgroundColor: 'var(--casa-surface)',
+                }}
+              >
+                Change Photo
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) handleImageUpload(file)
+                  }}
+                />
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setImageUrl('')
+                  setImagePreview('')
+                }}
+                className="px-3 py-1.5 rounded-lg text-sm"
+                style={{ color: 'var(--casa-diff-del-text)' }}
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        ) : (
+          <label
+            className="flex flex-col items-center justify-center gap-2 py-6 rounded-lg cursor-pointer"
+            style={{
+              border: '2px dashed var(--casa-border)',
+              backgroundColor: 'var(--casa-surface)',
+              color: 'var(--casa-text-muted)',
+              minHeight: '44px',
+            }}
+          >
+            {uploading ? (
+              <span className="text-sm">Uploading...</span>
+            ) : (
+              <>
+                <Camera className="w-6 h-6" />
+                <span className="text-sm">Upload photo or take picture</span>
+              </>
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              disabled={uploading}
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (file) handleImageUpload(file)
+              }}
+            />
+          </label>
+        )}
       </div>
 
       {/* Ingredients */}
@@ -461,7 +577,7 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
       <div className="flex flex-wrap gap-3">
         <Button
           type="submit"
-          disabled={saving || translating || !category}
+          disabled={saving || translating || uploading || !category}
           style={{ backgroundColor: 'var(--casa-primary)', color: '#FFFFFF' }}
         >
           {saving ? t('recipeForm.saving') : t('recipeForm.save')}
