@@ -98,9 +98,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 03.2-01-PLAN.md — Migration + type update, grocery items JSON, fix ItemForm bug, autocomplete, translate button, source/brand fields
+- [x] 03.2-01-PLAN.md — Migration + type update, grocery items JSON, fix ItemForm bug, autocomplete, translate button, source/brand fields
 - [x] 03.2-02-PLAN.md — Recipe image upload/camera capture, expand add-to-menu to all menus
-- [ ] 03.2-03-PLAN.md — Google Sheets bulk import with server-side CSV fetch, duplicate resolution, batch translation
+- [x] 03.2-03-PLAN.md — Google Sheets bulk import with server-side CSV fetch, duplicate resolution, batch translation
 
 ### Phase 4: Communication and Finance
 **Goal**: Client and cook can communicate across the language barrier in real time, and the client has full visibility into visit costs and payment status
