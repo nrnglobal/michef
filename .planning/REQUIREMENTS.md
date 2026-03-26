@@ -44,6 +44,15 @@
 - [ ] **AIOCR-03**: Client can review and correct extracted receipt data before saving
 - [x] **AIURL-01**: Client can import a recipe by pasting a URL; Claude parses the page and populates the recipe form
 
+### UX Enhancements (Phase 3.2)
+
+- [x] **UX-05**: Inventory add/edit form provides type-ahead autocomplete from a curated bilingual Mexican grocery items database; selecting a suggestion auto-fills Spanish name and category; custom items are allowed
+- [x] **UX-06**: Client can bulk-import inventory items by pasting a shared Google Sheets URL; duplicates prompt per-item skip/update; blank Spanish names auto-translate via Claude
+- [ ] **UX-07**: Client can upload or capture a recipe image from their device; URL text input removed from recipe form; imported image URLs continue to display
+- [x] **UX-08**: Client can add a recipe to any menu (draft or confirmed) from the recipe detail page
+- [ ] **UX-09**: Inventory items have optional source and brand fields; translate button translates English name to Spanish
+- [x] **UX-10**: Inventory add-item form input bug (losing focus after each keystroke) is fixed
+
 ### Messaging
 
 - [ ] **MSG-01**: Client can send a message to the cook in English; cook receives it in Spanish (Claude translates using Mexican Spanish with regional vocabulary)
@@ -143,12 +152,18 @@
 | EXP-02 | Phase 5 | Pending |
 | ANLX-01 | Phase 5 | Pending |
 | ANLX-02 | Phase 5 | Pending |
+| UX-05 | Phase 3.2 | Complete |
+| UX-06 | Phase 3.2 | Complete |
+| UX-07 | Phase 3.2 | Pending |
+| UX-08 | Phase 3.2 | Complete |
+| UX-09 | Phase 3.2 | Pending |
+| UX-10 | Phase 3.2 | Complete |
 
 **Coverage:**
-- v1 requirements: 40 total
-- Mapped to phases: 40
+- v1 requirements: 46 total
+- Mapped to phases: 46
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-22*
-*Last updated: 2026-03-22 after initial definition*
+*Last updated: 2026-03-25 — Phase 3.2 UX requirements added*
