@@ -38,7 +38,7 @@ export function RecipeDetailActions({ recipe }: RecipeDetailActionsProps) {
   const lastFeedbackRef = useRef<FeedbackPayload | null>(null)
 
   const [menuModalOpen, setMenuModalOpen] = useState(false)
-  const [draftMenus, setDraftMenus] = useState<Array<{ id: string; visit_date: string; recipe_count: number }>>([])
+  const [draftMenus, setDraftMenus] = useState<Array<{ id: string; visit_date: string; status: string; recipe_count: number }>>([])
   const [loadingMenus, setLoadingMenus] = useState(false)
   const [addingToMenu, setAddingToMenu] = useState<string | null>(null)
   const [menuMessage, setMenuMessage] = useState<string | null>(null)
@@ -108,13 +108,13 @@ export function RecipeDetailActions({ recipe }: RecipeDetailActionsProps) {
     const today = new Date().toISOString().split('T')[0]
     const { data } = await supabase
       .from('menu_plans')
-      .select('id, visit_date, menu_plan_items(id)')
-      .eq('status', 'draft')
+      .select('id, visit_date, status, menu_plan_items(id)')
       .gte('visit_date', today)
       .order('visit_date', { ascending: true })
     const menus = (data ?? []).map((p: any) => ({
       id: p.id,
       visit_date: p.visit_date,
+      status: p.status,
       recipe_count: Array.isArray(p.menu_plan_items) ? p.menu_plan_items.length : 0,
     }))
     setDraftMenus(menus)
@@ -264,7 +264,7 @@ export function RecipeDetailActions({ recipe }: RecipeDetailActionsProps) {
             <p className="text-sm py-4" style={{ color: 'var(--casa-text-muted)' }}>Loading menus...</p>
           ) : draftMenus.length === 0 ? (
             <div className="py-6 text-center">
-              <p className="text-sm" style={{ color: 'var(--casa-text-muted)' }}>No draft menus — create one first</p>
+              <p className="text-sm" style={{ color: 'var(--casa-text-muted)' }}>No upcoming menus — create one first</p>
               <a href="/menus" className="text-sm font-medium mt-2 inline-block" style={{ color: 'var(--casa-primary)' }}>
                 Go to Menus
               </a>
@@ -290,7 +290,22 @@ export function RecipeDetailActions({ recipe }: RecipeDetailActionsProps) {
                       color: 'var(--casa-text)',
                     }}
                   >
-                    <span className="text-sm font-medium">{dateStr}</span>
+                    <span className="flex items-center gap-2">
+                      <span className="text-sm font-medium">{dateStr}</span>
+                      <span
+                        className="px-1.5 py-0.5 rounded text-xs font-medium"
+                        style={{
+                          backgroundColor: menu.status === 'confirmed'
+                            ? 'var(--casa-primary-bg)'
+                            : 'var(--casa-surface-3)',
+                          color: menu.status === 'confirmed'
+                            ? 'var(--casa-primary-text)'
+                            : 'var(--casa-text-muted)',
+                        }}
+                      >
+                        {menu.status === 'confirmed' ? 'Confirmed' : 'Draft'}
+                      </span>
+                    </span>
                     <span className="text-xs" style={{ color: 'var(--casa-text-muted)' }}>
                       {addingToMenu === menu.id ? 'Adding...' : `${menu.recipe_count} recipes`}
                     </span>
