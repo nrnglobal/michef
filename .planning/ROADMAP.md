@@ -16,6 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Menu Planning and Shopping** - Core workflow: menu creation, AI suggestions, rules validation, shopping list, cook's mobile check-off view (completed 2026-03-23)
 - [x] **Phase 3: AI Features** - Claude API layer: recipe generation, feedback-driven adjustment with diff view, receipt OCR, recipe import from URL (completed 2026-03-24)
 - [x] **Phase 3.1: UX Enhancements** [INSERTED] - Inventory management, shopping list editing, recipe-to-menu shortcut, menu page fixes (dark mode, date editing, recipe limit) (completed 2026-03-25)
+- [ ] **Phase 3.2: Inventory & Recipe Enhancements** [INSERTED] - Ingredient autocomplete from grocery database, Google Sheets import, image upload/camera for recipes, expand add-to-menu to all menus, inventory source/brand fields, translate button
 - [ ] **Phase 4: Communication and Finance** - Real-time bilingual messaging, per-visit payment records, monthly spending summary
 - [ ] **Phase 5: Polish** - Offline shopping list, export, spending analytics
 
@@ -83,6 +84,24 @@ Plans:
 - [x] 03.1-01-PLAN.md — Inventory enhancements: is_staple migration, category tabs, staple toggle/filter, add-to-shopping-list
 - [x] 03.1-02-PLAN.md — Recipe-to-menu shortcut, menu editor fixes (limit 10, dark mode, date edit), shopping list verification
 
+### Phase 3.2: Inventory & Recipe Enhancements [INSERTED]
+**Goal**: Enhance inventory with ingredient autocomplete from a curated Mexican grocery database, bulk import via Google Sheets, translate button, source/brand fields, and fix the input bug. Enhance recipes with direct image upload/camera capture and expand add-to-menu to all menus (draft and confirmed).
+**Depends on**: Phase 3.1
+**Requirements**: UX-05, UX-06, UX-07, UX-08, UX-09, UX-10
+**Success Criteria** (what must be TRUE):
+  1. Inventory add/edit form has type-ahead autocomplete from a curated bilingual grocery items database; selecting a suggestion auto-fills Spanish name and category; custom items are still allowed
+  2. Client can import inventory items in bulk by pasting a shared Google Sheets URL; duplicates prompt per-item skip/update; blank Spanish names are auto-translated
+  3. Client can upload or capture a recipe image from their device; the URL text input is removed from the recipe form; existing imported images continue to display
+  4. Client can add a recipe to any menu (draft or confirmed) from the recipe detail page
+  5. Inventory items have optional source and brand fields; a translate button translates English name to Spanish
+  6. Inventory add-item form input bug (one letter at a time) is fixed
+**Plans**: 3 plans
+
+Plans:
+- [ ] 03.2-01-PLAN.md — Migration + type update, grocery items JSON, fix ItemForm bug, autocomplete, translate button, source/brand fields
+- [ ] 03.2-02-PLAN.md — Recipe image upload/camera capture, expand add-to-menu to all menus
+- [ ] 03.2-03-PLAN.md — Google Sheets bulk import with server-side CSV fetch, duplicate resolution, batch translation
+
 ### Phase 4: Communication and Finance
 **Goal**: Client and cook can communicate across the language barrier in real time, and the client has full visibility into visit costs and payment status
 **Depends on**: Phase 3
@@ -107,7 +126,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 2 → 3 → 3.1 → 4 → 5
+Phases execute in numeric order: 2 → 3 → 3.1 → 3.2 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -115,5 +134,6 @@ Phases execute in numeric order: 2 → 3 → 3.1 → 4 → 5
 | 2. Menu Planning and Shopping | 4/4 | Complete   | 2026-03-23 |
 | 3. AI Features | 5/5 | Complete    | 2026-03-24 |
 | 3.1. UX Enhancements | 2/2 | Complete   | 2026-03-25 |
+| 3.2. Inventory & Recipe Enhancements | 0/3 | Not started | - |
 | 4. Communication and Finance | 0/TBD | Not started | - |
 | 5. Polish | 0/TBD | Not started | - |
