@@ -1,0 +1,2 @@
+ALTER TABLE fridge_staples ADD COLUMN IF NOT EXISTS source TEXT;
+ALTER TABLE fridge_staples ADD COLUMN IF NOT EXISTS brand TEXT;

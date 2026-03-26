@@ -130,4 +130,6 @@ export interface FridgeStaple {
   category?: string
   is_active: boolean
   is_staple?: boolean
+  source?: string    // where to buy (e.g. "Walmart", "Costco")
+  brand?: string     // brand preference (e.g. "La Costena", "McCormick")
 }
