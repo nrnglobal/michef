@@ -48,7 +48,7 @@
 
 - [x] **UX-05**: Inventory add/edit form provides type-ahead autocomplete from a curated bilingual Mexican grocery items database; selecting a suggestion auto-fills Spanish name and category; custom items are allowed
 - [x] **UX-06**: Client can bulk-import inventory items by pasting a shared Google Sheets URL; duplicates prompt per-item skip/update; blank Spanish names auto-translate via Claude
-- [ ] **UX-07**: Client can upload or capture a recipe image from their device; URL text input removed from recipe form; imported image URLs continue to display
+- [x] **UX-07**: Client can upload or capture a recipe image from their device; URL text input removed from recipe form; imported image URLs continue to display
 - [x] **UX-08**: Client can add a recipe to any menu (draft or confirmed) from the recipe detail page
 - [ ] **UX-09**: Inventory items have optional source and brand fields; translate button translates English name to Spanish
 - [x] **UX-10**: Inventory add-item form input bug (losing focus after each keystroke) is fixed
@@ -154,7 +154,7 @@
 | ANLX-02 | Phase 5 | Pending |
 | UX-05 | Phase 3.2 | Complete |
 | UX-06 | Phase 3.2 | Complete |
-| UX-07 | Phase 3.2 | Pending |
+| UX-07 | Phase 3.2 | Complete |
 | UX-08 | Phase 3.2 | Complete |
 | UX-09 | Phase 3.2 | Pending |
 | UX-10 | Phase 3.2 | Complete |

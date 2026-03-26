@@ -99,7 +99,7 @@ Plans:
 
 Plans:
 - [ ] 03.2-01-PLAN.md — Migration + type update, grocery items JSON, fix ItemForm bug, autocomplete, translate button, source/brand fields
-- [ ] 03.2-02-PLAN.md — Recipe image upload/camera capture, expand add-to-menu to all menus
+- [x] 03.2-02-PLAN.md — Recipe image upload/camera capture, expand add-to-menu to all menus
 - [ ] 03.2-03-PLAN.md — Google Sheets bulk import with server-side CSV fetch, duplicate resolution, batch translation
 
 ### Phase 4: Communication and Finance
@@ -134,6 +134,6 @@ Phases execute in numeric order: 2 → 3 → 3.1 → 3.2 → 4 → 5
 | 2. Menu Planning and Shopping | 4/4 | Complete   | 2026-03-23 |
 | 3. AI Features | 5/5 | Complete    | 2026-03-24 |
 | 3.1. UX Enhancements | 2/2 | Complete   | 2026-03-25 |
-| 3.2. Inventory & Recipe Enhancements | 0/3 | Not started | - |
+| 3.2. Inventory & Recipe Enhancements | 1/3 | In progress | - |
 | 4. Communication and Finance | 0/TBD | Not started | - |
 | 5. Polish | 0/TBD | Not started | - |
