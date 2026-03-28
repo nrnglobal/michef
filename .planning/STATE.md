@@ -119,4 +119,4 @@ None yet.
 
 ## Session Continuity
 
-Last activity: 2026-03-28
+Last activity: 2026-03-28 - Completed quick task 260328-ijq: on /inventory, move the 'Add Item' button to the top right
