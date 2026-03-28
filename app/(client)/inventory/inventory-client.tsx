@@ -631,6 +631,51 @@ export function InventoryClient({ items }: Props) {
   return (
     <div className="space-y-4">
 
+      {/* Action buttons row */}
+      {!showAddForm && (
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowAddForm(true)}
+            className="flex items-center gap-2 text-sm font-medium"
+            style={{ color: 'var(--casa-primary)' }}
+          >
+            <Plus className="w-4 h-4" />
+            Add item
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowImport(!showImport)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium"
+            style={{
+              border: '1px solid var(--casa-border)',
+              color: 'var(--casa-primary)',
+              backgroundColor: 'var(--casa-surface)',
+            }}
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            Import from Sheets
+          </button>
+        </div>
+      )}
+
+      {/* Add form (appears at top when open) */}
+      {showAddForm && (
+        <ItemForm
+          form={addForm}
+          onChange={setAddForm}
+          onSubmit={handleAdd}
+          onCancel={() => { setShowAddForm(false); setAddForm(emptyForm) }}
+          submitLabel="Add Item"
+          saving={saving}
+          inputStyle={inputStyle}
+          suggestions={addSuggestions}
+          onSuggestionSelect={(gi) => handleSuggestionSelect(gi, setAddForm, addForm)}
+          onTranslate={() => handleTranslate(addForm.item_name_en, setAddForm, addForm)}
+          translating={translating}
+        />
+      )}
+
       {/* Tab bar + Staples filter */}
       <div className="flex items-center gap-2 flex-wrap">
         <div className="flex items-center gap-1 overflow-x-auto">
@@ -800,48 +845,6 @@ export function InventoryClient({ items }: Props) {
               </ul>
             </div>
           ))}
-        </div>
-      )}
-
-      {/* Add form */}
-      {showAddForm ? (
-        <ItemForm
-          form={addForm}
-          onChange={setAddForm}
-          onSubmit={handleAdd}
-          onCancel={() => { setShowAddForm(false); setAddForm(emptyForm) }}
-          submitLabel="Add Item"
-          saving={saving}
-          inputStyle={inputStyle}
-          suggestions={addSuggestions}
-          onSuggestionSelect={(gi) => handleSuggestionSelect(gi, setAddForm, addForm)}
-          onTranslate={() => handleTranslate(addForm.item_name_en, setAddForm, addForm)}
-          translating={translating}
-        />
-      ) : (
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setShowAddForm(true)}
-            className="flex items-center gap-2 text-sm font-medium"
-            style={{ color: 'var(--casa-primary)' }}
-          >
-            <Plus className="w-4 h-4" />
-            Add item
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowImport(!showImport)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium"
-            style={{
-              border: '1px solid var(--casa-border)',
-              color: 'var(--casa-primary)',
-              backgroundColor: 'var(--casa-surface)',
-            }}
-          >
-            <FileSpreadsheet className="w-4 h-4" />
-            Import from Sheets
-          </button>
         </div>
       )}
 
