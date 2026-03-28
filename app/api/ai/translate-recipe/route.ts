@@ -64,8 +64,10 @@ Translate naturally and accurately. Keep cooking terms precise. Ingredient names
 
     const data = await response.json()
     const text = data.content?.[0]?.text ?? ''
+    console.log('[translate-recipe] raw Claude text:', JSON.stringify(text))
     const clean = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim()
     const parsed = JSON.parse(clean)
+    console.log('[translate-recipe] parsed response:', JSON.stringify(parsed))
 
     return Response.json(parsed)
   } catch {
