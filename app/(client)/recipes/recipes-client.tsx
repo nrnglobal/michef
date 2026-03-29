@@ -1,12 +1,14 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Plus, Search, Sparkles, X, ChevronDown } from 'lucide-react'
+import { Plus, Search, Sparkles, X, ChevronDown, ImagePlus } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { RecipeCard } from '@/components/recipe-card'
+import type { DraftPlan } from '@/components/add-to-menu-button'
 import { GenerateRecipeModal } from '@/components/generate-recipe-modal'
 import { RecipeForm } from '@/components/recipe-form'
 import { useI18n } from '@/lib/i18n/config'
@@ -28,9 +30,11 @@ const CATEGORIES = [
 interface RecipesClientProps {
   items: Recipe[]
   variantMap: Record<string, Recipe[]>
+  draftPlans: DraftPlan[]
 }
 
-export function RecipesClient({ items, variantMap }: RecipesClientProps) {
+export function RecipesClient({ items, variantMap, draftPlans }: RecipesClientProps) {
+  const router = useRouter()
   const { t } = useI18n()
   const [expandedRecipe, setExpandedRecipe] = useState<string | null>(null)
   const [search, setSearch] = useState('')
@@ -38,6 +42,23 @@ export function RecipesClient({ items, variantMap }: RecipesClientProps) {
   const [showGenerate, setShowGenerate] = useState(false)
   const [generatedRecipe, setGeneratedRecipe] = useState<Partial<Recipe> | null>(null)
   const [genKey, setGenKey] = useState(0)
+  const [fetchingImages, setFetchingImages] = useState(false)
+  const [imageResult, setImageResult] = useState<{ updated: number; failed: number; total: number } | null>(null)
+
+  async function handleFetchImages() {
+    setFetchingImages(true)
+    setImageResult(null)
+    try {
+      const res = await fetch('/api/recipes/backfill-images', { method: 'POST' })
+      if (res.ok) {
+        const data = await res.json()
+        setImageResult(data)
+        router.refresh()
+      }
+    } finally {
+      setFetchingImages(false)
+    }
+  }
 
   const filteredRecipes = useMemo(() => {
     return items.filter((recipe) => {
@@ -66,6 +87,17 @@ export function RecipesClient({ items, variantMap }: RecipesClientProps) {
         </div>
         <div className="flex gap-2">
           <Button
+            onClick={handleFetchImages}
+            variant="outline"
+            disabled={fetchingImages}
+            title="Fetch images from Spoonacular for recipes that don't have one"
+            style={{ borderColor: 'var(--casa-border)', color: 'var(--casa-text-dark)' }}
+            className="gap-1.5"
+          >
+            <ImagePlus className="w-4 h-4" />
+            {fetchingImages ? 'Fetching…' : 'Fetch Images'}
+          </Button>
+          <Button
             onClick={() => setShowGenerate(true)}
             variant="outline"
             style={{ borderColor: 'var(--casa-primary)', color: 'var(--casa-primary)' }}
@@ -85,6 +117,28 @@ export function RecipesClient({ items, variantMap }: RecipesClientProps) {
           </Link>
         </div>
       </div>
+
+      {/* Image fetch result */}
+      {imageResult && (
+        <div
+          className="flex items-center justify-between px-4 py-2.5 rounded-lg text-sm"
+          style={{ backgroundColor: 'var(--casa-surface-3)', color: 'var(--casa-text)' }}
+        >
+          <span>
+            Images fetched: <strong>{imageResult.updated}</strong> updated,{' '}
+            <strong>{imageResult.failed}</strong> not found
+            {' '}(of {imageResult.total} recipes without images)
+          </span>
+          <button
+            onClick={() => setImageResult(null)}
+            className="ml-4 hover:opacity-70"
+            aria-label="Dismiss"
+            style={{ color: 'var(--casa-text-muted)' }}
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Search */}
       <div className="relative">
@@ -152,7 +206,7 @@ export function RecipesClient({ items, variantMap }: RecipesClientProps) {
             const variants = variantMap[recipe.id] ?? []
             return (
               <div key={recipe.id}>
-                <RecipeCard recipe={recipe} language="en" />
+                <RecipeCard recipe={recipe} language="en" draftPlans={draftPlans} />
                 {variants.length > 0 && (
                   <button
                     onClick={() => setExpandedRecipe(expandedRecipe === recipe.id ? null : recipe.id)}
@@ -168,7 +222,7 @@ export function RecipesClient({ items, variantMap }: RecipesClientProps) {
                 {expandedRecipe === recipe.id &&
                   variants.map((variant) => (
                     <div key={variant.id} className="ml-4 mt-1">
-                      <RecipeCard recipe={variant} language="en" />
+                      <RecipeCard recipe={variant} language="en" draftPlans={draftPlans} />
                     </div>
                   ))}
               </div>

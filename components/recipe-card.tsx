@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import type { Recipe } from '@/lib/types'
 import { useI18n } from '@/lib/i18n/config'
+import { AddToMenuButton, type DraftPlan } from '@/components/add-to-menu-button'
 
 const categoryColors: Record<string, { bg: string; text: string }> = {
   beef: { bg: '#FEF2F2', text: '#991B1B' },
@@ -23,9 +24,10 @@ const categoryColors: Record<string, { bg: string; text: string }> = {
 interface RecipeCardProps {
   recipe: Recipe
   language?: 'en' | 'es'
+  draftPlans?: DraftPlan[]
 }
 
-export const RecipeCard = memo(function RecipeCard({ recipe, language = 'en' }: RecipeCardProps) {
+export const RecipeCard = memo(function RecipeCard({ recipe, language = 'en', draftPlans }: RecipeCardProps) {
   const { t } = useI18n()
   const title = language === 'es' ? recipe.title_es : recipe.title_en
   const description =
@@ -34,17 +36,17 @@ export const RecipeCard = memo(function RecipeCard({ recipe, language = 'en' }: 
   const categoryStyle = categoryColors[recipe.category] ?? categoryColors.other
 
   return (
-    <Link href={`/recipes/${recipe.id}`}>
-      <div
-        className={cn(
-          'group rounded-xl border p-4 cursor-pointer transition-all hover:shadow-md',
-          !recipe.is_active && 'opacity-50'
-        )}
-        style={{
-          backgroundColor: 'var(--casa-surface)',
-          borderColor: 'var(--casa-border)',
-        }}
-      >
+    <div
+      className={cn(
+        'rounded-xl border transition-all hover:shadow-md',
+        !recipe.is_active && 'opacity-50'
+      )}
+      style={{
+        backgroundColor: 'var(--casa-surface)',
+        borderColor: 'var(--casa-border)',
+      }}
+    >
+      <Link href={`/recipes/${recipe.id}`} className="group block p-4">
         {/* Image thumbnail */}
         {recipe.image_url && (
           <div className="relative w-full h-32 mb-3 rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--casa-surface-3)' }}>
@@ -135,7 +137,13 @@ export const RecipeCard = memo(function RecipeCard({ recipe, language = 'en' }: 
             </div>
           )}
         </div>
-      </div>
-    </Link>
+      </Link>
+
+      {draftPlans !== undefined && (
+        <div className="px-4 pb-4">
+          <AddToMenuButton recipeId={recipe.id} draftPlans={draftPlans} />
+        </div>
+      )}
+    </div>
   )
 })

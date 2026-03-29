@@ -1,9 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
 import type { Recipe } from '@/lib/types'
 import { RecipesClient } from './recipes-client'
+import type { DraftPlan } from '@/components/add-to-menu-button'
 
 export default async function RecipesPage() {
   const supabase = await createClient()
+  const today = new Date().toISOString().split('T')[0]
 
   // Fetch all active top-level recipes server-side
   const { data: topLevelData } = await supabase
@@ -32,5 +34,15 @@ export default async function RecipesPage() {
     }
   }
 
-  return <RecipesClient items={recipes} variantMap={variantMap} />
+  // Fetch upcoming draft menu plans for the "Add to Menu" button
+  const { data: plansData } = await supabase
+    .from('menu_plans')
+    .select('id, visit_date, status')
+    .in('status', ['draft', 'confirmed'])
+    .gte('visit_date', today)
+    .order('visit_date', { ascending: true })
+
+  const draftPlans: DraftPlan[] = (plansData ?? []) as DraftPlan[]
+
+  return <RecipesClient items={recipes} variantMap={variantMap} draftPlans={draftPlans} />
 }
