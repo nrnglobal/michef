@@ -24,7 +24,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { RecipePickerModal } from './recipe-picker-modal'
+import { RecipePickerModal } from '@/components/recipe-picker-modal'
 import {
   addRecipeToPlan,
   removeRecipeFromPlan,
