@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import { Refrigerator } from 'lucide-react'
 import type { FridgeStaple } from '@/lib/types'
 import { InventoryClient } from './inventory-client'
 
@@ -33,22 +32,7 @@ export default async function InventoryPage() {
         </span>
       </div>
 
-      {allItems.length === 0 ? (
-        <div
-          className="flex flex-col items-center py-16 text-center rounded-xl border"
-          style={{ borderColor: 'var(--casa-border)', borderStyle: 'dashed' }}
-        >
-          <Refrigerator className="w-10 h-10 mb-3" style={{ color: 'var(--casa-icon-muted)' }} />
-          <p className="font-semibold" style={{ color: 'var(--casa-text)' }}>
-            No inventory items yet
-          </p>
-          <p className="text-sm mt-1" style={{ color: 'var(--casa-text-faint)' }}>
-            Add items you keep on hand so your shopping list only shows what&apos;s missing.
-          </p>
-        </div>
-      ) : (
-        <InventoryClient items={allItems} />
-      )}
+      <InventoryClient items={allItems} />
     </div>
   )
 }

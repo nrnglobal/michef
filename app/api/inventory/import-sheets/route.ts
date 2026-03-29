@@ -84,12 +84,18 @@ export async function POST(request: Request) {
   }
 
   // Step 5: Build parsed items with translations applied
-  const VALID_CATEGORIES = ['Produce', 'Protein', 'Dairy', 'Grains', 'Pantry', 'Spices', 'Other']
+  function normaliseCategoryServer(raw: string | undefined): 'Fridge' | 'Pantry' | 'Spices' | 'Other' {
+    const v = (raw ?? '').toLowerCase().trim()
+    if (['fridge', 'produce', 'protein', 'dairy', 'grains', 'frozen', 'bakery'].includes(v)) return 'Fridge'
+    if (v === 'pantry') return 'Pantry'
+    if (v === 'spices') return 'Spices'
+    return 'Other'
+  }
   const items = rows.map(row => ({
     item_name_en: row.item_name_en?.trim() ?? '',
     item_name_es: row.item_name_es?.trim() || translations[row.item_name_en?.trim()] || '',
     quantity: row.quantity?.trim() ?? '',
-    category: VALID_CATEGORIES.includes(row.category?.trim()) ? row.category.trim() : 'Other',
+    category: normaliseCategoryServer(row.category),
     source: row.source?.trim() ?? '',
     brand: row.brand?.trim() ?? '',
     is_staple: row.is_staple?.toLowerCase() === 'true',
