@@ -15,7 +15,6 @@ import {
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import {
   Dialog,
   DialogContent,
@@ -28,7 +27,6 @@ import { RecipePickerModal } from '@/components/recipe-picker-modal'
 import {
   addRecipeToPlan,
   removeRecipeFromPlan,
-  confirmMenuPlan,
   deleteMenuPlan,
   updateMenuPlanDate,
 } from '@/lib/menu-actions'
@@ -85,7 +83,6 @@ export default function MenuPlanPage() {
   const [suggestionRationale, setSuggestionRationale] = useState<string>('')
 
   const [isSuggesting, setIsSuggesting] = useState(false)
-  const [isConfirming, startConfirmTransition] = useTransition()
   const [isDeleting, startDeleteTransition] = useTransition()
 
   const selectedRecipes = planItems
@@ -242,17 +239,6 @@ export default function MenuPlanPage() {
     }
   }
 
-  const handleConfirm = () => {
-    startConfirmTransition(async () => {
-      try {
-        await confirmMenuPlan(planId)
-        router.push('/menus')
-      } catch {
-        toast.error("Couldn't create the shopping list. Confirm the menu again to retry.")
-      }
-    })
-  }
-
   const handleDelete = () => {
     startDeleteTransition(async () => {
       try {
@@ -303,8 +289,6 @@ export default function MenuPlanPage() {
     )
   }
 
-  const isConfirmed = plan.status === 'confirmed'
-
   return (
     <div className="space-y-6 pb-32">
       {/* Date display / edit */}
@@ -349,9 +333,6 @@ export default function MenuPlanPage() {
             <Pencil className="w-4 h-4 opacity-60 group-hover:opacity-100 transition-opacity" style={{ color: 'var(--casa-text-muted)' }} />
           </button>
         )}
-        <p className="text-sm mt-1" style={{ color: 'var(--casa-text-muted)' }}>
-          {isConfirmed ? 'Confirmed' : 'Draft'}
-        </p>
       </div>
 
       {/* Recipe slots */}
@@ -552,22 +533,6 @@ export default function MenuPlanPage() {
           Delete plan
         </button>
 
-        <Button
-          type="button"
-          onClick={handleConfirm}
-          disabled={isConfirming || selectedRecipes.length < 2}
-          className="sm:ml-auto min-w-[140px]"
-          style={{ backgroundColor: 'var(--casa-primary)', color: '#FFFFFF' }}
-        >
-          {isConfirming ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
-              Confirming...
-            </>
-          ) : (
-            'Confirm menu'
-          )}
-        </Button>
       </div>
 
       {/* Recipe picker modal */}

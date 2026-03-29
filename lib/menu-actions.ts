@@ -6,6 +6,110 @@ import { redirect } from 'next/navigation'
 import { consolidateIngredients } from '@/lib/consolidate-ingredients'
 import type { Ingredient } from '@/lib/types'
 
+/** Strip parenthetical notes and normalise to lowercase words. */
+function normalizeIngredientName(name: string): string {
+  return name
+    .replace(/\s*\([^)]*\)/g, '') // remove "(Must be cold-pressed + Extra virgin)" etc.
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function containsWholeWord(text: string, word: string): boolean {
+  const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return new RegExp(`(?:^|\\s)${escaped}(?:\\s|$)`).test(text)
+}
+
+/**
+ * Returns true if a recipe ingredient is covered by an inventory item.
+ * Handles cases like "Extra Virgin Olive Oil" matching "Olive oil (Must be cold-pressed)".
+ * Single-word items require an exact match to avoid "Butter" suppressing "Peanut Butter".
+ */
+function ingredientMatchesInventory(ingredientName: string, inventoryName: string): boolean {
+  const ing = normalizeIngredientName(ingredientName)
+  const inv = normalizeIngredientName(inventoryName)
+
+  if (!ing || !inv) return false
+  if (ing === inv) return true
+
+  const invWords = inv.split(' ').filter(Boolean)
+  const ingWords = ing.split(' ').filter(Boolean)
+
+  // Multi-word inventory item: match if all its words appear in the ingredient
+  if (invWords.length >= 2 && invWords.every((w) => containsWholeWord(ing, w))) return true
+
+  // Multi-word ingredient: match if all its words appear in the inventory item
+  if (ingWords.length >= 2 && ingWords.every((w) => containsWholeWord(inv, w))) return true
+
+  return false
+}
+
+/** Rebuild the shopping list for a plan from its current recipes. Idempotent. */
+async function syncShoppingList(planId: string, supabase: Awaited<ReturnType<typeof createClient>>) {
+  const { data: items } = await supabase
+    .from('menu_plan_items')
+    .select('recipe_id')
+    .eq('menu_plan_id', planId)
+
+  const recipeIds = (items ?? []).map((i: { recipe_id: string }) => i.recipe_id)
+
+  // Delete existing shopping list (full rebuild)
+  const { data: existingList } = await supabase
+    .from('shopping_lists')
+    .select('id')
+    .eq('menu_plan_id', planId)
+    .maybeSingle()
+
+  if (existingList) {
+    await supabase.from('shopping_list_items').delete().eq('shopping_list_id', existingList.id)
+    await supabase.from('shopping_lists').delete().eq('id', existingList.id)
+  }
+
+  if (recipeIds.length < 2) return
+
+  const { data: recipes } = await supabase
+    .from('recipes')
+    .select('id, ingredients')
+    .in('id', recipeIds)
+
+  const consolidated = consolidateIngredients(
+    (recipes ?? []).map((r: { id: string; ingredients: Ingredient[] }) => ({
+      id: r.id,
+      ingredients: r.ingredients,
+    }))
+  )
+
+  const { data: list, error: listError } = await supabase
+    .from('shopping_lists')
+    .insert({ menu_plan_id: planId, status: 'active' })
+    .select()
+    .single()
+
+  if (listError || !list) return
+
+  const { data: staples } = await supabase.from('fridge_staples').select('item_name_en')
+  const inventoryNames = (staples ?? []).map((s: { item_name_en: string }) => s.item_name_en)
+
+  const filteredItems = consolidated
+    .map((item) => ({
+      shopping_list_id: list.id,
+      ingredient_name_en: item.ingredient_name_en,
+      ingredient_name_es: item.ingredient_name_es,
+      quantity: item.quantity,
+      unit: item.unit,
+      category: item.category,
+      source_recipe_ids: item.source_recipe_ids,
+      is_checked: false,
+      is_always_stock: false,
+    }))
+    .filter((item) => !inventoryNames.some((inv) => ingredientMatchesInventory(item.ingredient_name_en, inv)))
+
+  if (filteredItems.length > 0) {
+    await supabase.from('shopping_list_items').insert(filteredItems)
+  }
+}
+
 export async function createMenuPlan(formData: FormData) {
   const visitDate = formData.get('visit_date') as string
   if (!visitDate) {
@@ -27,13 +131,16 @@ export async function createMenuPlan(formData: FormData) {
 
   const { data: plan, error } = await supabase
     .from('menu_plans')
-    .insert({ visit_date: visitDate, status: 'draft' })
+    .insert({ visit_date: visitDate, status: 'active' })
     .select()
     .single()
 
   if (error || !plan) {
     throw new Error(error?.message ?? 'Failed to create menu plan')
   }
+
+  // Create visit record immediately so the cook can see it
+  await supabase.from('visits').insert({ visit_date: visitDate, menu_plan_id: plan.id })
 
   revalidatePath('/menus')
   redirect('/menus/' + plan.id)
@@ -50,10 +157,9 @@ export async function addRecipeToPlan(
     .from('menu_plan_items')
     .insert({ menu_plan_id: planId, recipe_id: recipeId, sort_order: sortOrder })
 
-  if (error) {
-    throw new Error(error.message)
-  }
+  if (error) throw new Error(error.message)
 
+  await syncShoppingList(planId, supabase)
   revalidatePath('/menus/' + planId)
 }
 
@@ -68,11 +174,9 @@ export async function addRecipeToMenuPlan(menuPlanId: string, recipeId: string) 
     .eq('recipe_id', recipeId)
     .maybeSingle()
 
-  if (existing) {
-    return { error: 'already_on_menu' }
-  }
+  if (existing) return { error: 'already_on_menu' }
 
-  // Get current max sort_order for this plan
+  // Get current max sort_order
   const { data: items } = await supabase
     .from('menu_plan_items')
     .select('sort_order')
@@ -84,16 +188,11 @@ export async function addRecipeToMenuPlan(menuPlanId: string, recipeId: string) 
 
   const { error } = await supabase
     .from('menu_plan_items')
-    .insert({
-      menu_plan_id: menuPlanId,
-      recipe_id: recipeId,
-      sort_order: nextSort,
-    })
+    .insert({ menu_plan_id: menuPlanId, recipe_id: recipeId, sort_order: nextSort })
 
-  if (error) {
-    return { error: error.message }
-  }
+  if (error) return { error: error.message }
 
+  await syncShoppingList(menuPlanId, supabase)
   revalidatePath('/menus/' + menuPlanId)
   revalidatePath('/menus')
   return { success: true }
@@ -102,134 +201,14 @@ export async function addRecipeToMenuPlan(menuPlanId: string, recipeId: string) 
 export async function removeRecipeFromPlan(planId: string, itemId: string) {
   const supabase = await createClient()
 
-  const { error } = await supabase
-    .from('menu_plan_items')
-    .delete()
-    .eq('id', itemId)
+  const { error } = await supabase.from('menu_plan_items').delete().eq('id', itemId)
 
-  if (error) {
-    throw new Error(error.message)
-  }
+  if (error) throw new Error(error.message)
 
+  await syncShoppingList(planId, supabase)
   revalidatePath('/menus/' + planId)
 }
 
-export async function confirmMenuPlan(planId: string) {
-  const supabase = await createClient()
-
-  // Fetch plan items
-  const { data: items, error: itemsError } = await supabase
-    .from('menu_plan_items')
-    .select('recipe_id')
-    .eq('menu_plan_id', planId)
-
-  if (itemsError) throw new Error(itemsError.message)
-
-  const recipeIds = (items ?? []).map((i: { recipe_id: string }) => i.recipe_id)
-
-  if (recipeIds.length > 10) {
-    throw new Error('Maximum 10 recipes per menu plan')
-  }
-  if (recipeIds.length < 2) {
-    throw new Error('Minimum 2 recipes required to confirm')
-  }
-
-  // Fetch recipes with ingredients
-  const { data: recipes, error: recipesError } = await supabase
-    .from('recipes')
-    .select('id, ingredients')
-    .in('id', recipeIds)
-
-  if (recipesError) throw new Error(recipesError.message)
-
-  // Consolidate ingredients
-  const typedRecipes = (recipes ?? []).map((r: { id: string; ingredients: Ingredient[] }) => ({
-    id: r.id,
-    ingredients: r.ingredients,
-  }))
-  const consolidated = consolidateIngredients(typedRecipes)
-
-  // Check for existing shopping list (re-confirm case)
-  const { data: existingList } = await supabase
-    .from('shopping_lists')
-    .select('id')
-    .eq('menu_plan_id', planId)
-    .maybeSingle()
-
-  if (existingList) {
-    await supabase
-      .from('shopping_list_items')
-      .delete()
-      .eq('shopping_list_id', existingList.id)
-    await supabase
-      .from('shopping_lists')
-      .delete()
-      .eq('id', existingList.id)
-  }
-
-  // Create shopping list
-  const { data: list, error: listError } = await supabase
-    .from('shopping_lists')
-    .insert({ menu_plan_id: planId, status: 'active' })
-    .select()
-    .single()
-
-  if (listError || !list) throw new Error(listError?.message ?? 'Failed to create shopping list')
-
-  // Fetch active fridge staples to exclude on-hand items from shopping list
-  const { data: staples } = await supabase
-    .from('fridge_staples')
-    .select('item_name_en')
-    .eq('is_active', true)
-
-  const onHand = new Set((staples ?? []).map((s: { item_name_en: string }) => s.item_name_en.toLowerCase().trim()))
-
-  // Insert consolidated ingredient items, excluding items already in inventory
-  const ingredientItems = consolidated.map((item) => ({
-    shopping_list_id: list.id,
-    ingredient_name_en: item.ingredient_name_en,
-    ingredient_name_es: item.ingredient_name_es,
-    quantity: item.quantity,
-    unit: item.unit,
-    category: item.category,
-    source_recipe_ids: item.source_recipe_ids,
-    is_checked: false,
-    is_always_stock: false,
-  }))
-
-  const filteredItems = ingredientItems.filter(
-    (item) => !onHand.has(item.ingredient_name_en.toLowerCase().trim())
-  )
-
-  if (filteredItems.length > 0) {
-    const { error: insertError } = await supabase
-      .from('shopping_list_items')
-      .insert(filteredItems)
-    if (insertError) throw new Error(insertError.message)
-  }
-
-  // Update plan status to confirmed
-  const { data: planRow, error: updateError } = await supabase
-    .from('menu_plans')
-    .update({ status: 'confirmed' })
-    .eq('id', planId)
-    .select('visit_date')
-    .single()
-
-  if (updateError) throw new Error(updateError.message)
-
-  // Create visits row so cook can see upcoming visit (delete-first for re-confirm)
-  if (planRow) {
-    await supabase.from('visits').delete().eq('menu_plan_id', planId)
-    await supabase
-      .from('visits')
-      .insert({ visit_date: planRow.visit_date, menu_plan_id: planId })
-  }
-
-  revalidatePath('/menus')
-  revalidatePath('/menus/' + planId)
-  revalidatePath('/visita')
-}
 
 export async function deleteMenuPlan(planId: string) {
   const supabase = await createClient()
@@ -268,6 +247,10 @@ export async function updateMenuPlanDate(planId: string, newDate: string) {
 
   if (error) throw new Error(error.message)
 
+  // Keep visit record in sync
+  await supabase.from('visits').update({ visit_date: newDate }).eq('menu_plan_id', planId)
+
   revalidatePath('/menus')
   revalidatePath('/menus/' + planId)
+  revalidatePath('/visita')
 }
