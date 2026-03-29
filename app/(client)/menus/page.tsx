@@ -1,16 +1,19 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { CalendarDays } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { formatDate } from '@/lib/utils'
+import { MenuCard } from './menu-card'
 
 interface MenuPlanRow {
   id: string
   visit_date: string
   status: string
-  menu_plan_items: { id: string }[]
+  menu_plan_items: {
+    id: string
+    recipe_id: string
+    sort_order: number
+    recipes: { id: string; title_en: string; category: string } | null
+  }[]
 }
 
 export default async function MenusPage() {
@@ -19,9 +22,10 @@ export default async function MenusPage() {
 
   const { data: plans } = await supabase
     .from('menu_plans')
-    .select('*, menu_plan_items(id)')
+    .select('*, menu_plan_items(id, recipe_id, sort_order, recipes(id, title_en, category))')
     .gte('visit_date', today)
     .order('visit_date', { ascending: true })
+    .order('sort_order', { referencedTable: 'menu_plan_items', ascending: true })
 
   const menuPlans = (plans ?? []) as MenuPlanRow[]
 
@@ -29,11 +33,11 @@ export default async function MenusPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold" style={{ color: '#1A1410' }}>
+        <h1 className="text-xl font-semibold" style={{ color: 'var(--casa-text)' }}>
           Menu Plans
         </h1>
         <Link href="/menus/new">
-          <Button style={{ backgroundColor: '#8B6914', color: '#FFFFFF' }}>
+          <Button style={{ backgroundColor: 'var(--casa-primary)', color: '#FFFFFF' }}>
             Plan menu
           </Button>
         </Link>
@@ -42,85 +46,30 @@ export default async function MenusPage() {
       {/* Plan list */}
       {menuPlans.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {menuPlans.map((plan) => {
-            const isConfirmed = plan.status === 'confirmed'
-            const recipeCount = plan.menu_plan_items?.length ?? 0
-
-            return (
-              <Card
-                key={plan.id}
-                style={{
-                  border: '1px solid #E8E0D0',
-                  backgroundColor: '#FFFFFF',
-                }}
-                className="rounded-xl"
-              >
-                <CardContent className="pt-5">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <p className="font-semibold" style={{ color: '#1A1410' }}>
-                        {formatDate(plan.visit_date)}
-                      </p>
-                      <p className="text-sm" style={{ color: '#6B5B3E' }}>
-                        {recipeCount} recipe{recipeCount !== 1 ? 's' : ''}
-                      </p>
-                    </div>
-                    <Badge
-                      className="text-xs capitalize"
-                      style={
-                        isConfirmed
-                          ? {
-                              backgroundColor: '#EFF6FF',
-                              color: '#1D4ED8',
-                              border: '1px solid #BFDBFE',
-                            }
-                          : {
-                              backgroundColor: '#F0EBE0',
-                              color: '#6B5B3E',
-                              border: '1px solid #D6CABF',
-                            }
-                      }
-                    >
-                      {isConfirmed ? 'Confirmed' : 'Draft'}
-                    </Badge>
-                  </div>
-
-                  <div className="mt-4">
-                    <Link href={`/menus/${plan.id}`}>
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        style={{ borderColor: '#8B6914', color: '#8B6914' }}
-                      >
-                        Edit plan
-                      </Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })}
+          {menuPlans.map((plan) => (
+            <MenuCard key={plan.id} plan={plan} />
+          ))}
         </div>
       ) : (
         /* Empty state */
         <div
           className="text-center py-16 rounded-xl border"
-          style={{ borderColor: '#E8E0D0', borderStyle: 'dashed' }}
+          style={{ borderColor: 'var(--casa-border)', borderStyle: 'dashed' }}
         >
           <CalendarDays
             className="w-10 h-10 mx-auto mb-3"
-            style={{ color: '#C4B49A' }}
+            style={{ color: 'var(--casa-text-faint)' }}
           />
-          <p className="text-base font-semibold" style={{ color: '#1A1410' }}>
+          <p className="text-base font-semibold" style={{ color: 'var(--casa-text)' }}>
             No upcoming menus planned
           </p>
-          <p className="text-sm mt-1" style={{ color: '#9B8B70' }}>
+          <p className="text-sm mt-1" style={{ color: 'var(--casa-text-muted)' }}>
             Plan your next visit to get started.
           </p>
           <Link href="/menus/new">
             <Button
               className="mt-5"
-              style={{ backgroundColor: '#8B6914', color: '#FFFFFF' }}
+              style={{ backgroundColor: 'var(--casa-primary)', color: '#FFFFFF' }}
             >
               Plan menu
             </Button>
