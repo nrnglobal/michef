@@ -1,269 +1,36 @@
-'use client'
-
-import { useState, useEffect, useCallback } from 'react'
-import Link from 'next/link'
-import { Plus, Search, Sparkles, X, ChevronDown } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { RecipeCard } from '@/components/recipe-card'
-import { GenerateRecipeModal } from '@/components/generate-recipe-modal'
-import { RecipeForm } from '@/components/recipe-form'
-import { createClient } from '@/lib/supabase/client'
-import { useI18n } from '@/lib/i18n/config'
+import { createClient } from '@/lib/supabase/server'
 import type { Recipe } from '@/lib/types'
+import { RecipesClient } from './recipes-client'
 
-const CATEGORIES = [
-  'all',
-  'beef',
-  'chicken',
-  'seafood',
-  'veggies',
-  'snacks',
-  'carbs',
-  'soups',
-  'salads',
-  'other',
-]
+export default async function RecipesPage() {
+  const supabase = await createClient()
 
-export default function RecipesPage() {
-  const { t } = useI18n()
-  const [recipes, setRecipes] = useState<Recipe[]>([])
-  const [variants, setVariants] = useState<Map<string, Recipe[]>>(new Map())
-  const [expandedRecipe, setExpandedRecipe] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState('')
-  const [category, setCategory] = useState('all')
-  const [showGenerate, setShowGenerate] = useState(false)
-  const [generatedRecipe, setGeneratedRecipe] = useState<Partial<Recipe> | null>(null)
-  const [genKey, setGenKey] = useState(0)
+  // Fetch all active top-level recipes server-side
+  const { data: topLevelData } = await supabase
+    .from('recipes')
+    .select('*')
+    .is('parent_recipe_id', null)
+    .order('created_at', { ascending: false })
 
-  const fetchRecipes = useCallback(async () => {
-    setLoading(true)
-    const supabase = createClient()
+  const recipes = (topLevelData as Recipe[]) ?? []
 
-    // Fetch only top-level recipes (no parent)
-    let query = supabase
+  // Fetch variants for all top-level recipes
+  const topLevelIds = recipes.map((r) => r.id)
+  let variantMap: Record<string, Recipe[]> = {}
+
+  if (topLevelIds.length > 0) {
+    const { data: variantsData } = await supabase
       .from('recipes')
       .select('*')
-      .is('parent_recipe_id', null)
-      .order('created_at', { ascending: false })
+      .in('parent_recipe_id', topLevelIds)
+      .eq('is_active', true)
 
-    if (category !== 'all') {
-      query = query.eq('category', category)
+    const variantList = (variantsData as Recipe[]) ?? []
+    for (const v of variantList) {
+      if (!variantMap[v.parent_recipe_id!]) variantMap[v.parent_recipe_id!] = []
+      variantMap[v.parent_recipe_id!].push(v)
     }
+  }
 
-    if (search.trim()) {
-      query = query.ilike('title_en', `%${search.trim()}%`)
-    }
-
-    const { data, error } = await query
-    if (error) {
-      console.error('Recipe query failed:', error.message)
-      setRecipes([])
-      setLoading(false)
-      return
-    }
-    const topLevel = (data as Recipe[]) ?? []
-    setRecipes(topLevel)
-
-    // Fetch variants for these top-level recipes
-    const topLevelIds = topLevel.map((r: Recipe) => r.id)
-    let variantData: Recipe[] = []
-    if (topLevelIds.length > 0) {
-      const { data: variantsResult } = await supabase
-        .from('recipes')
-        .select('*')
-        .in('parent_recipe_id', topLevelIds)
-        .eq('is_active', true)
-      variantData = (variantsResult as Recipe[]) ?? []
-    }
-
-    // Build variant map keyed by parent recipe ID
-    const variantMap = new Map<string, Recipe[]>()
-    for (const v of variantData) {
-      const existing = variantMap.get(v.parent_recipe_id!) ?? []
-      existing.push(v)
-      variantMap.set(v.parent_recipe_id!, existing)
-    }
-    setVariants(variantMap)
-
-    setLoading(false)
-  }, [category, search])
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      fetchRecipes()
-    }, 300)
-    return () => clearTimeout(timeout)
-  }, [fetchRecipes])
-
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold" style={{ color: 'var(--casa-text)' }}>
-            {t('recipes.title')}
-          </h1>
-          <p className="text-sm mt-0.5" style={{ color: 'var(--casa-text-muted)' }}>
-            {recipes.length} recipe{recipes.length !== 1 ? 's' : ''} in your library
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            onClick={() => setShowGenerate(true)}
-            variant="outline"
-            style={{ borderColor: 'var(--casa-primary)', color: 'var(--casa-primary)' }}
-            className="gap-1.5"
-          >
-            <Sparkles className="w-4 h-4" />
-            Generate
-          </Button>
-          <Link href="/recipes/new">
-            <Button
-              style={{ backgroundColor: 'var(--casa-primary)', color: 'var(--casa-surface)' }}
-              className="gap-1.5"
-            >
-              <Plus className="w-4 h-4" />
-              {t('recipes.addRecipe')}
-            </Button>
-          </Link>
-        </div>
-      </div>
-
-      {/* Search */}
-      <div className="relative">
-        <Search
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
-          style={{ color: 'var(--casa-text-faint)' }}
-        />
-        <Input
-          placeholder={t('recipes.search')}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-9"
-          style={{ borderColor: 'var(--casa-border)' }}
-        />
-      </div>
-
-      {/* Category Tabs */}
-      <Tabs value={category} onValueChange={setCategory}>
-        <TabsList
-          className="flex flex-wrap gap-1 h-auto p-1 rounded-lg"
-          style={{ backgroundColor: 'var(--casa-surface-3)' }}
-        >
-          {CATEGORIES.map((cat) => (
-            <TabsTrigger
-              key={cat}
-              value={cat}
-              className="text-xs px-3 py-1.5 rounded-md data-[state=active]:shadow-sm capitalize"
-              style={{
-                color: category === cat ? 'var(--casa-primary)' : 'var(--casa-text-dark)',
-              }}
-            >
-              {t(`recipes.categories.${cat}`)}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
-
-      {/* Generated Recipe Preview */}
-      {generatedRecipe && (
-        <div
-          className="rounded-xl p-6 space-y-4"
-          style={{ border: '1px solid var(--casa-primary)', backgroundColor: 'var(--casa-surface)' }}
-        >
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold" style={{ color: 'var(--casa-text)' }}>
-              Generated Recipe — Review &amp; Save
-            </h2>
-            <button
-              onClick={() => setGeneratedRecipe(null)}
-              className="p-1 rounded hover:opacity-70 transition-opacity"
-              style={{ color: 'var(--casa-text-muted)' }}
-              aria-label="Dismiss generated recipe"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <RecipeForm key={genKey} recipe={generatedRecipe as Recipe} />
-        </div>
-      )}
-
-      {/* Recipe Grid */}
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div
-              key={i}
-              className="h-36 rounded-xl animate-pulse"
-              style={{ backgroundColor: 'var(--casa-border)' }}
-            />
-          ))}
-        </div>
-      ) : recipes.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {recipes.map((recipe) => (
-            <div key={recipe.id}>
-              <RecipeCard recipe={recipe} language="en" />
-              {(variants.get(recipe.id)?.length ?? 0) > 0 && (
-                <button
-                  onClick={() => setExpandedRecipe(expandedRecipe === recipe.id ? null : recipe.id)}
-                  className="w-full text-xs py-1.5 flex items-center justify-center gap-1"
-                  style={{ color: 'var(--casa-text-muted)' }}
-                >
-                  <ChevronDown
-                    className={`w-3 h-3 transition-transform ${expandedRecipe === recipe.id ? 'rotate-180' : ''}`}
-                  />
-                  + {variants.get(recipe.id)!.length} variant{variants.get(recipe.id)!.length !== 1 ? 's' : ''}
-                </button>
-              )}
-              {expandedRecipe === recipe.id &&
-                variants.get(recipe.id)?.map((variant) => (
-                  <div key={variant.id} className="ml-4 mt-1">
-                    <RecipeCard recipe={variant} language="en" />
-                  </div>
-                ))}
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div
-          className="text-center py-16 rounded-xl border"
-          style={{ borderColor: 'var(--casa-border)', borderStyle: 'dashed' }}
-        >
-          <p className="text-base font-medium" style={{ color: 'var(--casa-text)' }}>
-            {t('recipes.noResults')}
-          </p>
-          <p className="text-sm mt-1" style={{ color: 'var(--casa-text-faint)' }}>
-            {search || category !== 'all'
-              ? t('recipes.noResultsHint')
-              : 'Add your first recipe to get started'}
-          </p>
-          {!search && category === 'all' && (
-            <Link href="/recipes/new">
-              <Button
-                className="mt-4"
-                style={{ backgroundColor: 'var(--casa-primary)', color: 'var(--casa-surface)' }}
-              >
-                <Plus className="w-4 h-4 mr-1.5" />
-                {t('recipes.addRecipe')}
-              </Button>
-            </Link>
-          )}
-        </div>
-      )}
-
-      {/* Generate Recipe Modal */}
-      <GenerateRecipeModal
-        open={showGenerate}
-        onClose={() => setShowGenerate(false)}
-        onGenerated={(r) => {
-          setGeneratedRecipe(r)
-          setGenKey((k) => k + 1)
-        }}
-      />
-    </div>
-  )
+  return <RecipesClient items={recipes} variantMap={variantMap} />
 }
