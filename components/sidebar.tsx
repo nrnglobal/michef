@@ -1,13 +1,12 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import {
-  LayoutDashboard,
   BookOpen,
   CalendarDays,
   ShoppingCart,
-  DollarSign,
   Settings,
   LogOut,
   ChefHat,
@@ -19,12 +18,6 @@ import { useI18n } from '@/lib/i18n/config'
 import { ThemeToggle } from '@/components/theme-toggle'
 
 const navItems = [
-  {
-    key: 'nav.dashboard',
-    href: '/dashboard',
-    icon: LayoutDashboard,
-    active: true,
-  },
   {
     key: 'nav.recipes',
     href: '/recipes',
@@ -48,12 +41,6 @@ const navItems = [
     href: '/inventory',
     icon: Refrigerator,
     active: true,
-  },
-  {
-    key: 'nav.finances',
-    href: '/finances',
-    icon: DollarSign,
-    active: false,
   },
   {
     key: 'nav.rules',
@@ -80,7 +67,7 @@ export function Sidebar({ userName }: SidebarProps) {
 
   return (
     <aside
-      className="w-60 flex flex-col h-full border-r"
+      className="w-60 flex flex-col h-full border-r overflow-y-auto"
       style={{
         backgroundColor: 'var(--casa-surface)',
         borderColor: 'var(--casa-border)',
@@ -101,18 +88,29 @@ export function Sidebar({ userName }: SidebarProps) {
           className="font-semibold text-base tracking-tight"
           style={{ color: 'var(--casa-text)' }}
         >
-          Casa Cook
+          Mi Chef
         </span>
       </div>
 
+      {/* Chef image */}
+      <div className="px-4 pt-4 pb-2">
+        <Image
+          src="/chef-abuela.jpg"
+          alt="Casa Cook chef"
+          width={192}
+          height={320}
+          className="w-full rounded-xl object-contain"
+          priority
+        />
+      </div>
+
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 overflow-y-auto">
+      <nav className="px-3 py-4">
         <ul className="space-y-0.5">
           {navItems.map((item) => {
             const Icon = item.icon
             const isActive =
-              pathname === item.href ||
-              (item.href !== '/dashboard' && pathname.startsWith(item.href))
+              pathname === item.href || pathname.startsWith(item.href)
 
             return (
               <li key={item.href}>
@@ -162,7 +160,7 @@ export function Sidebar({ userName }: SidebarProps) {
 
       {/* User + Logout */}
       <div
-        className="px-3 py-4 border-t"
+        className="px-3 py-4 border-t mt-auto"
         style={{ borderColor: 'var(--casa-border)' }}
       >
         {userName && (
