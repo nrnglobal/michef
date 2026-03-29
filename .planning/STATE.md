@@ -110,6 +110,7 @@ None yet.
 | 260325-dre | add Spoonacular recipe search and import to /recipes/new page | 2026-03-25 | 8df1174 | [260325-dre-add-spoonacular-recipe-search-and-import](.planning/quick/260325-dre-add-spoonacular-recipe-search-and-import/) |
 | 260325-eue | add image support to recipes with image_url column, card thumbnail, detail hero, form input, and auto-population from Spoonacular and URL import | 2026-03-25 | e8036d4 | [260325-eue-add-image-support-to-recipes-with-image-](.planning/quick/260325-eue-add-image-support-to-recipes-with-image-/) |
 | 260328-ijq | move Add Item button to top of inventory page for immediate visibility | 2026-03-28 | d29832c | [260328-ijq-on-inventory-move-the-add-item-button-to](.planning/quick/260328-ijq-on-inventory-move-the-add-item-button-to/) |
+| 260328-say | audit app for performance issues: server-side recipes, loading skeletons, memoization | 2026-03-29 | 4c0d612 | [260328-say-audit-the-app-for-performance-issues-foc](.planning/quick/260328-say-audit-the-app-for-performance-issues-foc/) |
 
 ### Blockers/Concerns
 
@@ -119,4 +120,4 @@ None yet.
 
 ## Session Continuity
 
-Last activity: 2026-03-28 - Completed quick task 260328-ijq: on /inventory, move the 'Add Item' button to the top right
+Last activity: 2026-03-29 - Completed quick task 260328-say: performance audit (server-side recipes, loading skeletons, memoization)
