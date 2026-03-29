@@ -1,16 +1,23 @@
 'use client'
 
-import { useState } from 'react'
-import { Plus, Trash2, Pencil, Check, X, Star, ShoppingCart, Languages, FileSpreadsheet } from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { Plus, Trash2, Pencil, Check, X, Star, ShoppingCart, Languages, FileSpreadsheet, Refrigerator } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import type { FridgeStaple } from '@/lib/types'
 import groceryItems from '@/lib/data/grocery-items.json'
 
-const CATEGORIES = ['Produce', 'Protein', 'Dairy', 'Grains', 'Pantry', 'Spices', 'Other']
+const CATEGORIES = ['Fridge', 'Pantry', 'Spices', 'Other']
 
-const fridgeCats = ['Produce', 'Protein', 'Dairy', 'Grains', 'Other']
+/** Normalise any category string from the DB to one of the four canonical display groups. */
+function normaliseCategory(raw: string | null | undefined): 'Fridge' | 'Pantry' | 'Spices' | 'Other' {
+  const v = (raw ?? '').toLowerCase().trim()
+  if (['fridge', 'produce', 'protein', 'dairy', 'grains', 'frozen', 'bakery'].includes(v)) return 'Fridge'
+  if (v === 'pantry') return 'Pantry'
+  if (v === 'spices') return 'Spices'
+  return 'Other'
+}
 
 type ActiveTab = 'all' | 'fridge' | 'pantry' | 'spices'
 
@@ -33,7 +40,7 @@ const emptyForm: FormState = {
   item_name_en: '',
   item_name_es: '',
   quantity: '',
-  category: 'Other',
+  category: 'Fridge',
   source: '',
   brand: '',
 }
@@ -298,24 +305,30 @@ export function InventoryClient({ items }: Props) {
   const [importSaving, setImportSaving] = useState(false)
 
   // ── Autocomplete suggestions ────────────────────────────────────────────
-  const addSuggestions = addForm.item_name_en.length >= 1
-    ? (groceryItems as GroceryItem[])
-        .filter(item => item.name_en.toLowerCase().includes(addForm.item_name_en.toLowerCase()))
-        .slice(0, 8)
-    : []
+  const addSuggestions = useMemo(() =>
+    addForm.item_name_en.length >= 1
+      ? (groceryItems as GroceryItem[])
+          .filter(item => item.name_en.toLowerCase().includes(addForm.item_name_en.toLowerCase()))
+          .slice(0, 8)
+      : [],
+    [addForm.item_name_en]
+  )
 
-  const editSuggestions = editForm.item_name_en.length >= 1
-    ? (groceryItems as GroceryItem[])
-        .filter(item => item.name_en.toLowerCase().includes(editForm.item_name_en.toLowerCase()))
-        .slice(0, 8)
-    : []
+  const editSuggestions = useMemo(() =>
+    editForm.item_name_en.length >= 1
+      ? (groceryItems as GroceryItem[])
+          .filter(item => item.name_en.toLowerCase().includes(editForm.item_name_en.toLowerCase()))
+          .slice(0, 8)
+      : [],
+    [editForm.item_name_en]
+  )
 
   function handleSuggestionSelect(item: GroceryItem, formSetter: (f: FormState) => void, currentForm: FormState) {
     formSetter({
       ...currentForm,
       item_name_en: item.name_en,
       item_name_es: item.name_es,
-      category: item.category,
+      category: normaliseCategory(item.category),
     })
   }
 
@@ -394,6 +407,7 @@ export function InventoryClient({ items }: Props) {
     setImportSaving(true)
     const supabase = createClient()
     let added = 0, updated = 0, skipped = 0
+    const errors: string[] = []
 
     for (const row of importedItems) {
       if (row.isDuplicate) {
@@ -414,7 +428,11 @@ export function InventoryClient({ items }: Props) {
             is_staple: row.is_staple,
           })
           .eq('id', row.existingId!)
-        if (!error) updated++
+        if (error) {
+          errors.push(`Update "${row.item_name_en}": ${error.message}`)
+        } else {
+          updated++
+        }
       } else {
         // Insert new item
         const { error } = await supabase
@@ -429,8 +447,17 @@ export function InventoryClient({ items }: Props) {
             is_staple: row.is_staple,
             is_active: true,
           })
-        if (!error) added++
+        if (error) {
+          errors.push(`Insert "${row.item_name_en}": ${error.message}`)
+        } else {
+          added++
+        }
       }
+    }
+
+    // Report errors first
+    if (errors.length > 0) {
+      toast.error(`${errors.length} item(s) failed: ${errors[0]}`)
     }
 
     // Build result message
@@ -438,7 +465,7 @@ export function InventoryClient({ items }: Props) {
     if (added > 0) parts.push(`${added} items added`)
     if (updated > 0) parts.push(`${updated} updated`)
     if (skipped > 0) parts.push(`${skipped} skipped`)
-    toast.success(parts.join(', ') + '.')
+    if (parts.length > 0) toast.success(parts.join(', ') + '.')
 
     // Reset import state
     setShowImport(false)
@@ -450,24 +477,31 @@ export function InventoryClient({ items }: Props) {
   }
 
   // ── Filtered + grouped items ───────────────────────────────────────────────
-  const filteredItems = items.filter((item) => {
-    if (activeTab === 'fridge') {
-      if (!fridgeCats.includes(item.category ?? 'Other')) return false
-    } else if (activeTab === 'pantry') {
-      if (item.category !== 'Pantry') return false
-    } else if (activeTab === 'spices') {
-      if (item.category !== 'Spices') return false
-    }
-    if (staplesFilter && !item.is_staple) return false
-    return true
-  })
+  const filteredItems = useMemo(() =>
+    items.filter((item) => {
+      const cat = normaliseCategory(item.category)
+      if (activeTab === 'fridge') {
+        if (cat !== 'Fridge') return false
+      } else if (activeTab === 'pantry') {
+        if (cat !== 'Pantry') return false
+      } else if (activeTab === 'spices') {
+        if (cat !== 'Spices') return false
+      }
+      if (staplesFilter && !item.is_staple) return false
+      return true
+    }),
+    [items, activeTab, staplesFilter]
+  )
 
-  const categoryGroups = filteredItems.reduce<Record<string, FridgeStaple[]>>((acc, item) => {
-    const cat = item.category ?? 'Other'
-    if (!acc[cat]) acc[cat] = []
-    acc[cat].push(item)
-    return acc
-  }, {})
+  const categoryGroups = useMemo(() =>
+    filteredItems.reduce<Record<string, FridgeStaple[]>>((acc, item) => {
+      const cat = normaliseCategory(item.category)
+      if (!acc[cat]) acc[cat] = []
+      acc[cat].push(item)
+      return acc
+    }, {}),
+    [filteredItems]
+  )
 
   // ── Handlers ──────────────────────────────────────────────────────────────
   async function handleAdd(e: React.FormEvent) {
@@ -496,7 +530,7 @@ export function InventoryClient({ items }: Props) {
       item_name_en: item.item_name_en,
       item_name_es: item.item_name_es,
       quantity: item.quantity ?? '',
-      category: item.category ?? 'Other',
+      category: normaliseCategory(item.category),
       source: item.source ?? '',
       brand: item.brand ?? '',
     })
@@ -716,7 +750,20 @@ export function InventoryClient({ items }: Props) {
       )}
 
       {/* Category groups */}
-      {Object.keys(categoryGroups).sort().length === 0 ? (
+      {items.length === 0 ? (
+        <div
+          className="flex flex-col items-center py-16 text-center rounded-xl border"
+          style={{ borderColor: 'var(--casa-border)', borderStyle: 'dashed' }}
+        >
+          <Refrigerator className="w-10 h-10 mb-3" style={{ color: 'var(--casa-icon-muted)' }} />
+          <p className="font-semibold" style={{ color: 'var(--casa-text)' }}>
+            No inventory items yet
+          </p>
+          <p className="text-sm mt-1" style={{ color: 'var(--casa-text-faint)' }}>
+            Add items you keep on hand so your shopping list only shows what&apos;s missing.
+          </p>
+        </div>
+      ) : Object.keys(categoryGroups).sort().length === 0 ? (
         <p className="text-sm py-4 text-center" style={{ color: 'var(--casa-text-faint)' }}>
           No items in this view
         </p>

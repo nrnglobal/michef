@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import Link from 'next/link'
 import { Clock, Users, Youtube } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -24,7 +25,7 @@ interface RecipeCardProps {
   language?: 'en' | 'es'
 }
 
-export function RecipeCard({ recipe, language = 'en' }: RecipeCardProps) {
+export const RecipeCard = memo(function RecipeCard({ recipe, language = 'en' }: RecipeCardProps) {
   const { t } = useI18n()
   const title = language === 'es' ? recipe.title_es : recipe.title_en
   const description =
@@ -137,4 +138,4 @@ export function RecipeCard({ recipe, language = 'en' }: RecipeCardProps) {
       </div>
     </Link>
   )
-}
+})
