@@ -112,7 +112,7 @@ None yet.
 | 260328-ijq | move Add Item button to top of inventory page for immediate visibility | 2026-03-28 | d29832c | [260328-ijq-on-inventory-move-the-add-item-button-to](.planning/quick/260328-ijq-on-inventory-move-the-add-item-button-to/) |
 | 260328-say | audit app for performance issues: server-side recipes, loading skeletons, memoization | 2026-03-29 | 4c0d612 | [260328-say-audit-the-app-for-performance-issues-foc](.planning/quick/260328-say-audit-the-app-for-performance-issues-foc/) |
 | 260329-018 | improve menus page UI: recipe pills, inline add/remove, confirmed read-only | 2026-03-29 | b9f05bd | [260329-018-improve-the-menus-page-ui-per-the-ui-spe](.planning/quick/260329-018-improve-the-menus-page-ui-per-the-ui-spe/) |
-| 260330-20z | move left sidebar to top header menu — horizontal nav bar with logo, links, user info, theme toggle, logout | 2026-03-30 | 60b3764 | [260330-20z-move-left-sidebar-to-top-header-menu-thi](.planning/quick/260330-20z-move-left-sidebar-to-top-header-menu-thi/) |
+| 260330-20z | move left sidebar to top header menu (this should replace the sidebar) | 2026-03-30 | 903db51 | [260330-20z-move-left-sidebar-to-top-header-menu-thi](.planning/quick/260330-20z-move-left-sidebar-to-top-header-menu-thi/) |
 
 ### Blockers/Concerns
 
@@ -122,4 +122,4 @@ None yet.
 
 ## Session Continuity
 
-Last activity: 2026-03-30 - Completed quick task 260330-20z: replaced left sidebar with horizontal top header nav (awaiting human verify checkpoint)
+Last activity: 2026-03-30 - Completed quick task 260330-20z: move left sidebar to top header menu (this should replace the sidebar)
