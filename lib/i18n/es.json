@@ -11,15 +11,13 @@
     "logout": "Cerrar sesión"
   },
   "auth": {
-    "login": "Iniciar sesión",
-    "loginTitle": "Bienvenida a Casa Cook",
-    "loginSubtitle": "Inicia sesión para ver tu próxima visita",
-    "email": "Correo electrónico",
-    "password": "Contraseña",
-    "emailPlaceholder": "tu@correo.com",
-    "passwordPlaceholder": "••••••••",
-    "loggingIn": "Iniciando sesión...",
-    "loginError": "Correo o contraseña incorrectos. Inténtalo de nuevo.",
+    "login": "Entrar",
+    "loginTitle": "Mi Chef",
+    "loginSubtitle": "Ingresa tu código de acceso para continuar",
+    "passcode": "Código de acceso",
+    "passcodePlaceholder": "••••••••",
+    "loggingIn": "Verificando...",
+    "loginError": "Código incorrecto. Inténtalo de nuevo.",
     "noCredentials": "No hay credenciales de Supabase configuradas."
   },
   "dashboard": {
