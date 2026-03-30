@@ -18,12 +18,24 @@ export async function loginWithPasscode(passcode: string): Promise<{ error: stri
     },
   ]
 
+  // Debug: check which env vars are present (never logs values)
+  const debug = users.map((u, i) => ({
+    index: i,
+    hasPasscode: !!u.passcode,
+    hasEmail: !!u.email,
+    hasUserId: !!u.userId,
+    passcodeLength: u.passcode?.length ?? 0,
+    inputLength: passcode.length,
+    matches: u.passcode === passcode,
+  }))
+  console.log('[login debug]', JSON.stringify(debug))
+
   const match = users.find(
     (u) => u.passcode && u.email && u.userId && passcode === u.passcode
   )
 
   if (!match) {
-    return { error: 'Incorrect passcode. Please try again.' }
+    return { error: `Incorrect passcode. Debug: ${JSON.stringify(debug)}` }
   }
 
   // Sync the passcode as the Supabase password (env var is source of truth)
