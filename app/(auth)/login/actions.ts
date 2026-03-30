@@ -40,7 +40,10 @@ export async function loginWithPasscode(passcode: string): Promise<{ error: stri
 
   // Sync the passcode as the Supabase password (env var is source of truth)
   const admin = createAdminClient()
-  await admin.auth.admin.updateUserById(match.userId!, { password: passcode })
+  const { error: updateError } = await admin.auth.admin.updateUserById(match.userId!, { password: passcode })
+  if (updateError) {
+    return { error: `Password sync failed: ${updateError.message}` }
+  }
 
   // Sign in to create a session
   const supabase = await createClient()
@@ -50,7 +53,7 @@ export async function loginWithPasscode(passcode: string): Promise<{ error: stri
   })
 
   if (error || !data.user) {
-    return { error: 'Login failed. Please try again.' }
+    return { error: `Sign in failed: ${error?.message ?? 'no user returned'}` }
   }
 
   // Role-based redirect
