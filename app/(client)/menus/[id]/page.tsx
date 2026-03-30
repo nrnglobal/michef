@@ -378,6 +378,16 @@ export default function MenuPlanPage() {
                       borderColor: 'var(--casa-border)',
                     }}
                   >
+                    {recipe.image_url && (
+                      <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0" style={{ backgroundColor: 'var(--casa-surface-3)' }}>
+                        <img
+                          src={recipe.image_url}
+                          alt={recipe.title_en}
+                          className="w-full h-full object-cover"
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                        />
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <Link
                         href={`/recipes/${recipe.id}`}

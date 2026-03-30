@@ -11,15 +11,13 @@
     "logout": "Log out"
   },
   "auth": {
-    "login": "Log in",
-    "loginTitle": "Welcome to Casa Cook",
-    "loginSubtitle": "Sign in to manage your household kitchen",
-    "email": "Email address",
-    "password": "Password",
-    "emailPlaceholder": "you@example.com",
-    "passwordPlaceholder": "••••••••",
-    "loggingIn": "Logging in...",
-    "loginError": "Invalid email or password. Please try again.",
+    "login": "Enter",
+    "loginTitle": "Mi Chef",
+    "loginSubtitle": "Enter your passcode to continue",
+    "passcode": "Passcode",
+    "passcodePlaceholder": "••••••••",
+    "loggingIn": "Checking...",
+    "loginError": "Incorrect passcode. Please try again.",
     "noCredentials": "No Supabase credentials configured. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to .env.local"
   },
   "dashboard": {

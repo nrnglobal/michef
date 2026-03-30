@@ -20,7 +20,7 @@ import type { Recipe, Ingredient } from '@/lib/types'
 import { toast } from 'sonner'
 
 async function resizeImageToLimit(file: File, maxBytes = 5 * 1024 * 1024): Promise<Blob> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const img = new Image()
     const url = URL.createObjectURL(file)
     img.onload = () => {
@@ -35,7 +35,17 @@ async function resizeImageToLimit(file: File, maxBytes = 5 * 1024 * 1024): Promi
       canvas.height = height
       canvas.getContext('2d')!.drawImage(img, 0, 0, width, height)
       URL.revokeObjectURL(url)
-      canvas.toBlob((blob) => resolve(blob!), 'image/jpeg', 0.85)
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error('canvas.toBlob returned null — image format may not be supported'))
+          return
+        }
+        resolve(blob)
+      }, 'image/jpeg', 0.85)
+    }
+    img.onerror = () => {
+      URL.revokeObjectURL(url)
+      reject(new Error('Image failed to load — file may be corrupt or unsupported'))
     }
     img.src = url
   })
@@ -115,8 +125,9 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
       const path = `recipe-images/${uploadPathKey}/${Date.now()}.jpg`
       const { data, error } = await supabase.storage
         .from('receipts')
-        .upload(path, resized, { contentType: 'image/jpeg', upsert: true })
+        .upload(path, resized, { contentType: 'image/jpeg', upsert: false })
       if (error) {
+        console.error('Storage upload error:', error)
         toast.error('Image upload failed. Try again or skip the image.')
         return
       }
@@ -124,7 +135,8 @@ export function RecipeForm({ recipe }: RecipeFormProps) {
       const publicUrl = urlData.publicUrl
       setImageUrl(publicUrl)
       setImagePreview(publicUrl)
-    } catch {
+    } catch (err) {
+      console.error('Image upload exception:', err)
       toast.error('Image upload failed. Try again or skip the image.')
     } finally {
       setUploading(false)

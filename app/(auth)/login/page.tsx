@@ -1,61 +1,28 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { loginWithPasscode } from './actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import en from '@/lib/i18n/en.json'
 
 export default function LoginPage() {
   const t = en
-  const router = useRouter()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [passcode, setPasscode] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const hasSupabaseConfig =
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
-
-    if (!hasSupabaseConfig) {
-      setError(t.auth.noCredentials)
-      return
-    }
-
     setLoading(true)
     setError(null)
 
-    const supabase = createClient()
-    const { data, error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-
-    if (authError || !data.user) {
-      setError(t.auth.loginError)
-      setLoading(false)
-      return
-    }
-
-    // Check profile role and redirect
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('user_id', data.user.id)
-      .single()
-
-    if (profile?.role === 'cook') {
-      router.push('/visita')
-    } else {
-      router.push('/dashboard')
-    }
+    const result = await loginWithPasscode(passcode)
+    // If we get here, login failed (success triggers a redirect)
+    setError(result.error)
+    setLoading(false)
   }
 
   return (
@@ -63,8 +30,7 @@ export default function LoginPage() {
       className="min-h-screen flex items-center justify-center p-4"
       style={{ backgroundColor: '#FAFAF8' }}
     >
-      <div className="w-full max-w-md">
-        {/* Logo / Brand */}
+      <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div
             className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
@@ -72,10 +38,7 @@ export default function LoginPage() {
           >
             <span className="text-white text-2xl font-bold">CC</span>
           </div>
-          <h1
-            className="text-2xl font-semibold"
-            style={{ color: '#1A1410' }}
-          >
+          <h1 className="text-2xl font-semibold" style={{ color: '#1A1410' }}>
             {t.auth.loginTitle}
           </h1>
           <p className="mt-1 text-sm" style={{ color: '#6B5B3E' }}>
@@ -94,41 +57,21 @@ export default function LoginPage() {
             <CardTitle className="text-lg" style={{ color: '#1A1410' }}>
               {t.auth.login}
             </CardTitle>
-            <CardDescription style={{ color: '#6B5B3E' }}>
-              {hasSupabaseConfig
-                ? t.auth.loginSubtitle
-                : 'Demo mode — add .env.local to enable authentication'}
-            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="email" style={{ color: '#1A1410' }}>
-                  {t.auth.email}
+                <Label htmlFor="passcode" style={{ color: '#1A1410' }}>
+                  {t.auth.passcode}
                 </Label>
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder={t.auth.emailPlaceholder}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={loading}
-                  style={{ borderColor: '#E8E0D0', color: '#1A1410', backgroundColor: '#FFFFFF' }}
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="password" style={{ color: '#1A1410' }}>
-                  {t.auth.password}
-                </Label>
-                <Input
-                  id="password"
+                  id="passcode"
                   type="password"
-                  placeholder={t.auth.passwordPlaceholder}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder={t.auth.passcodePlaceholder}
+                  value={passcode}
+                  onChange={(e) => setPasscode(e.target.value)}
                   required
+                  autoFocus
                   disabled={loading}
                   style={{ borderColor: '#E8E0D0', color: '#1A1410', backgroundColor: '#FFFFFF' }}
                 />
@@ -147,30 +90,11 @@ export default function LoginPage() {
                 </div>
               )}
 
-              {!hasSupabaseConfig && (
-                <div
-                  className="text-sm p-3 rounded-lg"
-                  style={{
-                    backgroundColor: '#FEF9EC',
-                    color: '#854D0E',
-                    border: '1px solid #FCD34D',
-                  }}
-                >
-                  <strong>Setup required:</strong> Copy{' '}
-                  <code className="font-mono">.env.local.example</code> to{' '}
-                  <code className="font-mono">.env.local</code> and add your
-                  Supabase credentials.
-                </div>
-              )}
-
               <Button
                 type="submit"
                 className="w-full font-medium"
                 disabled={loading}
-                style={{
-                  backgroundColor: '#8B6914',
-                  color: '#FFFFFF',
-                }}
+                style={{ backgroundColor: '#8B6914', color: '#FFFFFF' }}
               >
                 {loading ? t.auth.loggingIn : t.auth.login}
               </Button>
