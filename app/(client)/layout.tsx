@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Sidebar } from '@/components/sidebar'
+import { HeaderNav } from '@/components/header-nav'
 import { I18nProvider } from '@/lib/i18n/config'
 
 export default async function ClientLayout({
@@ -32,8 +32,8 @@ export default async function ClientLayout({
 
   return (
     <I18nProvider initialLanguage="en">
-      <div className="flex h-screen overflow-hidden" style={{ backgroundColor: 'var(--casa-bg)' }}>
-        <Sidebar userName={userName} />
+      <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--casa-bg)' }}>
+        <HeaderNav userName={userName} />
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-6xl mx-auto px-6 py-8">{children}</div>
         </main>
