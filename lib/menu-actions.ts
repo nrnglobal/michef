@@ -131,7 +131,7 @@ export async function createMenuPlan(formData: FormData) {
 
   const { data: plan, error } = await supabase
     .from('menu_plans')
-    .insert({ visit_date: visitDate, status: 'active' })
+    .insert({ visit_date: visitDate, status: 'draft' })
     .select()
     .single()
 
