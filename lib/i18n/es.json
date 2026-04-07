@@ -173,6 +173,12 @@
     "emptyListBody": "Aun no hay ingredientes asignados.",
     "addItem": "Agregar articulo a la lista",
     "addItemPlaceholder": "Agregar un articulo...",
+    "translate": "Traducir",
+    "translating": "Traduciendo...",
+    "addToList": "Agregar",
+    "adding": "Agregando...",
+    "addItemError": "Error al agregar articulo",
+    "translateError": "No se pudo traducir. Intenta escribir el nombre en español.",
     "fridgeStaples": "Siempre en casa",
     "checkError": "Error al actualizar el articulo"
   },

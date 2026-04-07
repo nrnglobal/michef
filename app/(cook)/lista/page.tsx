@@ -1,10 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Plus, ShoppingCart } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Languages, Loader2, Plus, ShoppingCart } from 'lucide-react'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
+import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { useI18n } from '@/lib/i18n/config'
 import { toTitleCase, formatDateEs } from '@/lib/utils'
@@ -16,8 +18,12 @@ export default function ListaPage() {
   const [listId, setListId] = useState<string | null>(null)
   const [visitDate, setVisitDate] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  const [showInput, setShowInput] = useState(false)
-  const [inputText, setInputText] = useState('')
+
+  const [newItemInput, setNewItemInput] = useState('')
+  const [translated, setTranslated] = useState<{ en: string; es: string; category: string } | null>(null)
+  const [translating, setTranslating] = useState(false)
+  const [adding, setAdding] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     async function fetchData() {
@@ -71,6 +77,58 @@ export default function ListaPage() {
     fetchData()
   }, [])
 
+  async function handleTranslate() {
+    if (!newItemInput.trim()) return
+    setTranslating(true)
+    setTranslated(null)
+    try {
+      const res = await fetch('/api/ai/translate-ingredient', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newItemInput.trim() }),
+      })
+      if (!res.ok) throw new Error('translate failed')
+      const data = await res.json()
+      setTranslated({ en: data.ingredient_name_en, es: data.ingredient_name_es, category: data.category })
+    } catch {
+      toast.error(t('shopping.translateError'))
+    } finally {
+      setTranslating(false)
+    }
+  }
+
+  async function handleAddItem() {
+    if (!listId) return
+    const nameEs = translated?.es ?? newItemInput.trim()
+    const nameEn = translated?.en ?? newItemInput.trim()
+    if (!nameEs) return
+
+    setAdding(true)
+    const supabase = createClient()
+    const { data, error } = await supabase
+      .from('shopping_list_items')
+      .insert({
+        shopping_list_id: listId,
+        ingredient_name_en: nameEn,
+        ingredient_name_es: nameEs,
+        category: translated?.category ?? 'Other',
+        is_checked: false,
+        is_always_stock: false,
+      })
+      .select()
+      .single()
+
+    if (error || !data) {
+      toast.error(t('shopping.addItemError'))
+    } else {
+      setItems(prev => [...prev, data as ShoppingListItem])
+      setNewItemInput('')
+      setTranslated(null)
+      inputRef.current?.focus()
+    }
+    setAdding(false)
+  }
+
   async function handleCheck(itemId: string, checked: boolean) {
     // 1. Optimistic local update
     setItems(prev =>
@@ -102,40 +160,6 @@ export default function ListaPage() {
       )
       toast.error(t('shopping.checkError'))
     }
-  }
-
-  async function handleAddItem(e: React.FormEvent) {
-    e.preventDefault()
-    if (!inputText.trim() || !listId) return
-
-    const newItem: ShoppingListItem = {
-      id: crypto.randomUUID(),
-      shopping_list_id: listId,
-      ingredient_name_en: inputText.trim(),
-      ingredient_name_es: inputText.trim(),
-      quantity: undefined,
-      unit: undefined,
-      category: 'Other',
-      is_checked: false,
-      is_always_stock: false,
-    }
-
-    // Optimistic add
-    setItems(prev => [...prev, newItem])
-    setInputText('')
-    setShowInput(false)
-
-    const supabase = createClient()
-    await supabase.from('shopping_list_items').insert({
-      shopping_list_id: listId,
-      ingredient_name_en: newItem.ingredient_name_en,
-      ingredient_name_es: newItem.ingredient_name_es,
-      quantity: null,
-      unit: null,
-      category: 'Other',
-      is_checked: false,
-      is_always_stock: false,
-    })
   }
 
   if (loading) {
@@ -197,32 +221,42 @@ export default function ListaPage() {
         </span>
       </div>
 
-      {/* Ad-hoc input (shown when + is tapped) */}
-      {showInput && (
-        <form onSubmit={handleAddItem} className="flex gap-2">
-          <input
-            type="text"
-            autoFocus
-            value={inputText}
-            onChange={e => setInputText(e.target.value)}
-            placeholder={t('shopping.addItemPlaceholder')}
-            className="flex-1 px-3 py-2 rounded-lg border text-sm outline-none focus:ring-2"
-            style={{ borderColor: 'var(--casa-border)', color: 'var(--casa-text)' }}
-            onKeyDown={e => {
-              if (e.key === 'Escape') {
-                setShowInput(false)
-                setInputText('')
-              }
-            }}
-          />
-          <button
-            type="submit"
-            className="px-4 py-2 rounded-lg text-sm font-semibold text-white"
-            style={{ backgroundColor: 'var(--casa-primary)' }}
-          >
-            Agregar
-          </button>
-        </form>
+      {/* Add Item */}
+      {listId && (
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <Input
+              ref={inputRef}
+              value={newItemInput}
+              onChange={e => { setNewItemInput(e.target.value); setTranslated(null) }}
+              onKeyDown={e => { if (e.key === 'Enter') translated ? handleAddItem() : handleTranslate() }}
+              placeholder={t('shopping.addItemPlaceholder')}
+              className="flex-1"
+            />
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleTranslate}
+              disabled={!newItemInput.trim() || translating}
+              title={t('shopping.translate')}
+            >
+              {translating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Languages className="w-4 h-4" />}
+            </Button>
+            <Button
+              size="icon"
+              onClick={handleAddItem}
+              disabled={adding || (!translated && !newItemInput.trim())}
+              title={t('shopping.addToList')}
+            >
+              {adding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+            </Button>
+          </div>
+          {translated && (
+            <p className="text-xs px-1" style={{ color: 'var(--casa-text-faint)' }}>
+              {translated.es}{translated.en !== translated.es ? ` · ${translated.en}` : ''} · {translated.category}
+            </p>
+          )}
+        </div>
       )}
 
       {/* Recipe items grouped by category */}
@@ -281,18 +315,7 @@ export default function ListaPage() {
         </div>
       )}
 
-      {/* Floating add button */}
-      {listId && (
-        <button
-          type="button"
-          onClick={() => setShowInput(s => !s)}
-          className="fixed bottom-24 right-4 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-opacity hover:opacity-90"
-          style={{ backgroundColor: 'var(--casa-primary)' }}
-          aria-label={t('shopping.addItem')}
-        >
-          <Plus className="w-6 h-6 text-white" />
-        </button>
-      )}
+
     </div>
   )
 }

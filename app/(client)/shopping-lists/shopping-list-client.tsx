@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Trash2, Pencil } from 'lucide-react'
+import { Languages, Loader2, Pencil, Plus, Trash2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { toTitleCase } from '@/lib/utils'
@@ -51,6 +51,33 @@ function ItemForm({
   submitLabel: string
   saving: boolean
 }) {
+  const [translating, setTranslating] = useState(false)
+
+  async function handleTranslate() {
+    const name = form.ingredient_name_en.trim() || form.ingredient_name_es.trim()
+    if (!name) return
+    setTranslating(true)
+    try {
+      const res = await fetch('/api/ai/translate-ingredient', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+      })
+      if (!res.ok) throw new Error('translate failed')
+      const data = await res.json()
+      onChange({
+        ...form,
+        ingredient_name_en: data.ingredient_name_en || form.ingredient_name_en,
+        ingredient_name_es: data.ingredient_name_es || form.ingredient_name_es,
+        category: data.category || form.category,
+      })
+    } catch {
+      // silently fail — user can fill in manually
+    } finally {
+      setTranslating(false)
+    }
+  }
+
   return (
     <form
       onSubmit={onSubmit}
@@ -73,9 +100,22 @@ function ItemForm({
           />
         </div>
         <div>
-          <label className="block text-xs font-medium mb-1" style={{ color: 'var(--casa-text-faint)' }}>
-            Name (Spanish)
-          </label>
+          <div className="flex items-center justify-between mb-1">
+            <label className="block text-xs font-medium" style={{ color: 'var(--casa-text-faint)' }}>
+              Name (Spanish)
+            </label>
+            <button
+              type="button"
+              onClick={handleTranslate}
+              disabled={translating || (!form.ingredient_name_en.trim() && !form.ingredient_name_es.trim())}
+              className="flex items-center gap-1 text-xs font-medium disabled:opacity-40"
+              style={{ color: 'var(--casa-primary)' }}
+              title="Auto-translate"
+            >
+              {translating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Languages className="w-3 h-3" />}
+              Translate
+            </button>
+          </div>
           <input
             type="text"
             value={form.ingredient_name_es}
@@ -252,6 +292,29 @@ export function ShoppingListClient({ listId, items }: Props) {
           {error}
         </p>
       )}
+
+      {/* Add item — near the top */}
+      {showAddForm ? (
+        <ItemForm
+          form={addForm}
+          onChange={setAddForm}
+          onSubmit={handleAdd}
+          onCancel={() => { setShowAddForm(false); setAddForm(emptyForm) }}
+          submitLabel="Add Item"
+          saving={saving}
+        />
+      ) : (
+        <button
+          type="button"
+          onClick={() => setShowAddForm(true)}
+          className="flex items-center gap-2 text-sm font-medium"
+          style={{ color: 'var(--casa-primary)' }}
+        >
+          <Plus className="w-4 h-4" />
+          Add item
+        </button>
+      )}
+
       {Object.keys(categoryGroups).sort().map((cat) => (
         <div key={cat}>
           <p
@@ -322,29 +385,6 @@ export function ShoppingListClient({ listId, items }: Props) {
         </div>
       ))}
 
-      {/* Add form */}
-      <div className="pt-2">
-        {showAddForm ? (
-          <ItemForm
-            form={addForm}
-            onChange={setAddForm}
-            onSubmit={handleAdd}
-            onCancel={() => { setShowAddForm(false); setAddForm(emptyForm) }}
-            submitLabel="Add Item"
-            saving={saving}
-          />
-        ) : (
-          <button
-            type="button"
-            onClick={() => setShowAddForm(true)}
-            className="flex items-center gap-2 text-sm font-medium"
-            style={{ color: 'var(--casa-primary)' }}
-          >
-            <Plus className="w-4 h-4" />
-            Add item
-          </button>
-        )}
-      </div>
     </div>
   )
 }

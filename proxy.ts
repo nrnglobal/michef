@@ -70,7 +70,7 @@ export async function proxy(request: NextRequest) {
     if (profile?.role === 'cook') {
       redirectUrl.pathname = '/visita'
     } else {
-      redirectUrl.pathname = '/dashboard'
+      redirectUrl.pathname = '/menus'
     }
     return NextResponse.redirect(redirectUrl)
   }
@@ -88,8 +88,7 @@ export async function proxy(request: NextRequest) {
     // Cook trying to access client routes
     if (
       role === 'cook' &&
-      (pathname.startsWith('/dashboard') ||
-        pathname.startsWith('/menus') ||
+      (pathname.startsWith('/menus') ||
         pathname.startsWith('/recipes'))
     ) {
       const redirectUrl = request.nextUrl.clone()
@@ -105,7 +104,7 @@ export async function proxy(request: NextRequest) {
         pathname.startsWith('/lista'))
     ) {
       const redirectUrl = request.nextUrl.clone()
-      redirectUrl.pathname = '/dashboard'
+      redirectUrl.pathname = '/menus'
       return NextResponse.redirect(redirectUrl)
     }
   }

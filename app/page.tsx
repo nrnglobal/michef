@@ -19,5 +19,5 @@ export default async function HomePage() {
     redirect('/visita')
   }
 
-  redirect('/dashboard')
+  redirect('/menus')
 }

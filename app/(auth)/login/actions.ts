@@ -63,5 +63,5 @@ export async function loginWithPasscode(passcode: string): Promise<{ error: stri
     .eq('user_id', data.user.id)
     .single()
 
-  redirect(profile?.role === 'cook' ? '/visita' : '/dashboard')
+  redirect(profile?.role === 'cook' ? '/visita' : '/menus')
 }

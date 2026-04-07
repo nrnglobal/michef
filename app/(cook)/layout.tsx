@@ -27,7 +27,7 @@ export default async function CookLayout({
 
   // Redirect clients to their area
   if (profile && profile.role !== 'cook') {
-    redirect('/dashboard')
+    redirect('/menus')
   }
 
   return (

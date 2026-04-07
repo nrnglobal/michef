@@ -173,6 +173,12 @@
     "emptyListBody": "No ingredients assigned yet.",
     "addItem": "Add item to shopping list",
     "addItemPlaceholder": "Add an item...",
+    "translate": "Translate",
+    "translating": "Translating...",
+    "addToList": "Add",
+    "adding": "Adding...",
+    "addItemError": "Failed to add item",
+    "translateError": "Couldn't translate. Try typing the name in Spanish.",
     "fridgeStaples": "Always in stock",
     "checkError": "Failed to update item"
   },

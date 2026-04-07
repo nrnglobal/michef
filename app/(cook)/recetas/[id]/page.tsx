@@ -8,10 +8,12 @@ import { toTitleCase, formatInstructions } from '@/lib/utils'
 
 interface PageProps {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ from?: string }>
 }
 
-export default async function RecetaDetailPage({ params }: PageProps) {
+export default async function RecetaDetailPage({ params, searchParams }: PageProps) {
   const { id } = await params
+  const { from } = await searchParams
   const supabase = await createClient()
 
   const { data: recipe } = await supabase
@@ -27,12 +29,12 @@ export default async function RecetaDetailPage({ params }: PageProps) {
     <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
       {/* Back link */}
       <Link
-        href="/recetas"
+        href={from === 'visita' ? '/visita' : '/recetas'}
         className="flex items-center gap-1.5 text-sm font-medium hover:underline"
         style={{ color: 'var(--casa-primary)' }}
       >
         <ArrowLeft className="w-4 h-4" />
-        Mis Recetas
+        {from === 'visita' ? 'Menú del día' : 'Mis Recetas'}
       </Link>
 
       {/* Title + Meta */}

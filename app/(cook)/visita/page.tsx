@@ -5,7 +5,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { formatDateEs } from '@/lib/utils'
 import type { Visit, MenuPlan, Recipe } from '@/lib/types'
-import { VisitaReceiptSection } from '@/components/visita-receipt-section'
 
 const statusColors: Record<string, { bg: string; text: string; label: string }> = {
   draft: { bg: '#F9FAFB', text: '#374151', label: 'Borrador' },
@@ -156,7 +155,7 @@ export default async function VisitaPage() {
             {menuRecipes.length > 0 ? (
               <div className="space-y-3">
                 {menuRecipes.map((recipe, idx) => (
-                  <Link key={recipe.id} href={`/recetas/${recipe.id}`} className="block">
+                  <Link key={recipe.id} href={`/recetas/${recipe.id}?from=visita`} className="block">
                     <Card style={{ border: '1px solid var(--casa-border)', backgroundColor: 'var(--casa-surface)' }}>
                       <CardContent className="pt-4 pb-4">
                         <div className="flex items-start gap-3">
@@ -170,21 +169,12 @@ export default async function VisitaPage() {
                             <p className="font-semibold text-sm" style={{ color: 'var(--casa-text)' }}>
                               {recipe.title_es}
                             </p>
-                            <p className="text-xs mt-0.5" style={{ color: 'var(--casa-text-faint)' }}>
-                              {recipe.title_en}
-                            </p>
                             {recipe.prep_time_minutes && (
                               <p className="text-xs mt-1" style={{ color: 'var(--casa-text-faint)' }}>
                                 {recipe.prep_time_minutes} min
                               </p>
                             )}
                           </div>
-                          <span
-                            className="text-xs font-medium px-2 py-0.5 rounded-full capitalize shrink-0"
-                            style={{ backgroundColor: 'var(--casa-surface-3)', color: 'var(--casa-text-muted)' }}
-                          >
-                            {recipe.category}
-                          </span>
                         </div>
                       </CardContent>
                     </Card>
@@ -219,15 +209,6 @@ export default async function VisitaPage() {
             </Link>
           )}
 
-          {/* Receipt upload section */}
-          {visit && (
-            <div>
-              <h2 className="font-semibold mb-3" style={{ color: 'var(--casa-text)' }}>
-                Recibo de compras
-              </h2>
-              <VisitaReceiptSection visitId={visit.id} />
-            </div>
-          )}
 
           {/* Payment info */}
           {(visit.grocery_total || visit.service_fee || visit.total_payment) && (
