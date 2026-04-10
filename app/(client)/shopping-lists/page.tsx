@@ -7,11 +7,10 @@ export default async function ShoppingListsPage() {
   const supabase = await createClient()
   const today = new Date().toISOString().split('T')[0]
 
-  // Find next upcoming confirmed plan
+  // Find next upcoming plan
   const { data: plan } = await supabase
     .from('menu_plans')
     .select('id, visit_date')
-    .eq('status', 'confirmed')
     .gte('visit_date', today)
     .order('visit_date', { ascending: true })
     .limit(1)
@@ -29,10 +28,10 @@ export default async function ShoppingListsPage() {
         >
           <ShoppingCart className="w-10 h-10 mb-3" style={{ color: 'var(--casa-icon-muted)' }} />
           <p className="font-semibold" style={{ color: 'var(--casa-text)' }}>
-            No confirmed menu yet
+            No upcoming menu yet
           </p>
           <p className="text-sm mt-1" style={{ color: 'var(--casa-text-faint)' }}>
-            Confirm a menu plan to generate a shopping list.
+            Plan a menu to generate a shopping list.
           </p>
         </div>
       </div>

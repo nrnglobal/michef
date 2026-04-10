@@ -6,44 +6,6 @@ import { redirect } from 'next/navigation'
 import { consolidateIngredients } from '@/lib/consolidate-ingredients'
 import type { Ingredient } from '@/lib/types'
 
-/** Strip parenthetical notes and normalise to lowercase words. */
-function normalizeIngredientName(name: string): string {
-  return name
-    .replace(/\s*\([^)]*\)/g, '') // remove "(Must be cold-pressed + Extra virgin)" etc.
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-}
-
-function containsWholeWord(text: string, word: string): boolean {
-  const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  return new RegExp(`(?:^|\\s)${escaped}(?:\\s|$)`).test(text)
-}
-
-/**
- * Returns true if a recipe ingredient is covered by an inventory item.
- * Handles cases like "Extra Virgin Olive Oil" matching "Olive oil (Must be cold-pressed)".
- * Single-word items require an exact match to avoid "Butter" suppressing "Peanut Butter".
- */
-function ingredientMatchesInventory(ingredientName: string, inventoryName: string): boolean {
-  const ing = normalizeIngredientName(ingredientName)
-  const inv = normalizeIngredientName(inventoryName)
-
-  if (!ing || !inv) return false
-  if (ing === inv) return true
-
-  const invWords = inv.split(' ').filter(Boolean)
-  const ingWords = ing.split(' ').filter(Boolean)
-
-  // Multi-word inventory item: match if all its words appear in the ingredient
-  if (invWords.length >= 2 && invWords.every((w) => containsWholeWord(ing, w))) return true
-
-  // Multi-word ingredient: match if all its words appear in the inventory item
-  if (ingWords.length >= 2 && ingWords.every((w) => containsWholeWord(inv, w))) return true
-
-  return false
-}
 
 /** Rebuild the shopping list for a plan from its current recipes. Idempotent. */
 async function syncShoppingList(planId: string, supabase: Awaited<ReturnType<typeof createClient>>) {
@@ -88,25 +50,20 @@ async function syncShoppingList(planId: string, supabase: Awaited<ReturnType<typ
 
   if (listError || !list) return
 
-  const { data: staples } = await supabase.from('fridge_staples').select('item_name_en')
-  const inventoryNames = (staples ?? []).map((s: { item_name_en: string }) => s.item_name_en)
+  const allItems = consolidated.map((item) => ({
+    shopping_list_id: list.id,
+    ingredient_name_en: item.ingredient_name_en,
+    ingredient_name_es: item.ingredient_name_es,
+    quantity: item.quantity,
+    unit: item.unit,
+    category: item.category,
+    source_recipe_ids: item.source_recipe_ids,
+    is_checked: false,
+    is_always_stock: false,
+  }))
 
-  const filteredItems = consolidated
-    .map((item) => ({
-      shopping_list_id: list.id,
-      ingredient_name_en: item.ingredient_name_en,
-      ingredient_name_es: item.ingredient_name_es,
-      quantity: item.quantity,
-      unit: item.unit,
-      category: item.category,
-      source_recipe_ids: item.source_recipe_ids,
-      is_checked: false,
-      is_always_stock: false,
-    }))
-    .filter((item) => !inventoryNames.some((inv) => ingredientMatchesInventory(item.ingredient_name_en, inv)))
-
-  if (filteredItems.length > 0) {
-    await supabase.from('shopping_list_items').insert(filteredItems)
+  if (allItems.length > 0) {
+    await supabase.from('shopping_list_items').insert(allItems)
   }
 }
 
