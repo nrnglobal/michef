@@ -599,7 +599,6 @@ export function InventoryClient({ items }: Props) {
     const { data: plan } = await supabase
       .from('menu_plans')
       .select('id')
-      .eq('status', 'confirmed')
       .gte('visit_date', today)
       .order('visit_date', { ascending: true })
       .limit(1)
@@ -623,7 +622,7 @@ export function InventoryClient({ items }: Props) {
       return
     }
 
-    await supabase.from('shopping_list_items').insert({
+    const { error: insertError } = await supabase.from('shopping_list_items').insert({
       shopping_list_id: list.id,
       ingredient_name_en: item.item_name_en,
       ingredient_name_es: item.item_name_es,
@@ -632,7 +631,14 @@ export function InventoryClient({ items }: Props) {
       category: 'staple',
       is_checked: false,
       is_always_stock: item.is_staple ?? false,
+      is_custom: true,
     })
+
+    if (insertError) {
+      setShoppingError('Failed to add to shopping list')
+      setAddingToList(null)
+      return
+    }
 
     setAddingToList(null)
     setShoppingSuccess('Added to shopping list')
