@@ -93,6 +93,8 @@ export interface ShoppingListItem {
   source_recipe_ids?: string[]
   is_checked: boolean
   is_always_stock: boolean
+  is_custom: boolean
+  manually_removed: boolean
   checked_at?: string
 }
 

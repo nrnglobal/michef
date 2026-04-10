@@ -216,6 +216,7 @@ export function ShoppingListClient({ listId, items }: Props) {
       category: addForm.category,
       is_checked: false,
       is_always_stock: false,
+      is_custom: true,
     })
     setSaving(false)
     if (addError) {
@@ -263,12 +264,16 @@ export function ShoppingListClient({ listId, items }: Props) {
     router.refresh()
   }
 
-  async function handleDelete(itemId: string) {
+  async function handleDelete(item: ShoppingListItem) {
     if (!window.confirm('Remove this item from the shopping list?')) return
-    setDeleting(itemId)
+    setDeleting(item.id)
     setError(null)
     const supabase = createClient()
-    const { error: deleteError } = await supabase.from('shopping_list_items').delete().eq('id', itemId)
+    // Custom items are hard-deleted; recipe-derived items become tombstones so
+    // syncShoppingList() knows not to re-add them when recipes change.
+    const { error: deleteError } = item.is_custom
+      ? await supabase.from('shopping_list_items').delete().eq('id', item.id)
+      : await supabase.from('shopping_list_items').update({ manually_removed: true }).eq('id', item.id)
     setDeleting(null)
     if (deleteError) {
       setError('Failed to remove item. Please try again.')
@@ -369,7 +374,7 @@ export function ShoppingListClient({ listId, items }: Props) {
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => handleDelete(item)}
                       disabled={deleting === item.id}
                       title="Remove item"
                       className="p-1.5 rounded-md hover:bg-red-50 transition-colors"

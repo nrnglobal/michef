@@ -7,25 +7,52 @@ import { consolidateIngredients } from '@/lib/consolidate-ingredients'
 import type { Ingredient } from '@/lib/types'
 
 
-/** Rebuild the shopping list for a plan from its current recipes. Idempotent. */
+/** Sync the shopping list for a plan from its current recipes.
+ *  Non-destructive: preserves custom items and respects manually-removed tombstones. */
 async function syncShoppingList(planId: string, supabase: Awaited<ReturnType<typeof createClient>>) {
-  const { data: items } = await supabase
+  const { data: planItems } = await supabase
     .from('menu_plan_items')
     .select('recipe_id')
     .eq('menu_plan_id', planId)
 
-  const recipeIds = (items ?? []).map((i: { recipe_id: string }) => i.recipe_id)
+  const recipeIds = (planItems ?? []).map((i: { recipe_id: string }) => i.recipe_id)
 
-  // Delete existing shopping list (full rebuild)
-  const { data: existingList } = await supabase
+  // Get or create the shopping list — never delete it so custom items survive
+  let { data: list } = await supabase
     .from('shopping_lists')
     .select('id')
     .eq('menu_plan_id', planId)
     .maybeSingle()
 
-  if (existingList) {
-    await supabase.from('shopping_list_items').delete().eq('shopping_list_id', existingList.id)
-    await supabase.from('shopping_lists').delete().eq('id', existingList.id)
+  if (!list) {
+    const { data: newList, error: listError } = await supabase
+      .from('shopping_lists')
+      .insert({ menu_plan_id: planId, status: 'active' })
+      .select()
+      .single()
+    if (listError || !newList) return
+    list = newList
+  }
+
+  // Fetch existing items to separate custom/tombstone items from stale recipe items
+  const { data: existingItems } = await supabase
+    .from('shopping_list_items')
+    .select('id, ingredient_name_en, is_custom, manually_removed')
+    .eq('shopping_list_id', list.id)
+
+  // Build set of ingredient names the user has explicitly removed (case-insensitive)
+  const removedNames = new Set(
+    (existingItems ?? [])
+      .filter((i: { manually_removed: boolean }) => i.manually_removed)
+      .map((i: { ingredient_name_en: string }) => i.ingredient_name_en.toLowerCase().trim())
+  )
+
+  // Delete only stale recipe-derived items; custom items and tombstones stay
+  const staleIds = (existingItems ?? [])
+    .filter((i: { is_custom: boolean; manually_removed: boolean }) => !i.is_custom && !i.manually_removed)
+    .map((i: { id: string }) => i.id)
+  if (staleIds.length > 0) {
+    await supabase.from('shopping_list_items').delete().in('id', staleIds)
   }
 
   if (recipeIds.length < 2) return
@@ -42,28 +69,25 @@ async function syncShoppingList(planId: string, supabase: Awaited<ReturnType<typ
     }))
   )
 
-  const { data: list, error: listError } = await supabase
-    .from('shopping_lists')
-    .insert({ menu_plan_id: planId, status: 'active' })
-    .select()
-    .single()
+  // Skip any ingredient the user has manually removed
+  const newItems = consolidated
+    .filter((item) => !removedNames.has(item.ingredient_name_en.toLowerCase().trim()))
+    .map((item) => ({
+      shopping_list_id: list.id,
+      ingredient_name_en: item.ingredient_name_en,
+      ingredient_name_es: item.ingredient_name_es,
+      quantity: item.quantity,
+      unit: item.unit,
+      category: item.category,
+      source_recipe_ids: item.source_recipe_ids,
+      is_checked: false,
+      is_always_stock: false,
+      is_custom: false,
+      manually_removed: false,
+    }))
 
-  if (listError || !list) return
-
-  const allItems = consolidated.map((item) => ({
-    shopping_list_id: list.id,
-    ingredient_name_en: item.ingredient_name_en,
-    ingredient_name_es: item.ingredient_name_es,
-    quantity: item.quantity,
-    unit: item.unit,
-    category: item.category,
-    source_recipe_ids: item.source_recipe_ids,
-    is_checked: false,
-    is_always_stock: false,
-  }))
-
-  if (allItems.length > 0) {
-    await supabase.from('shopping_list_items').insert(allItems)
+  if (newItems.length > 0) {
+    await supabase.from('shopping_list_items').insert(newItems)
   }
 }
 

@@ -62,6 +62,7 @@ export default async function ShoppingListsPage() {
     .from('shopping_list_items')
     .select('*')
     .eq('shopping_list_id', list.id)
+    .eq('manually_removed', false)
     .order('category')
     .order('ingredient_name_en')
 
