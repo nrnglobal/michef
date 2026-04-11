@@ -1,11 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Languages, Loader2, Pencil, Plus, Trash2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { toTitleCase } from '@/lib/utils'
 import type { ShoppingListItem } from '@/lib/types'
+import groceryItems from '@/lib/data/grocery-items.json'
+
+interface GroceryItem {
+  name_en: string
+  name_es: string
+  category: string
+}
 
 const CATEGORIES = ['Produce', 'Protein', 'Dairy', 'Grains', 'Pantry', 'Spices', 'Other']
 
@@ -43,6 +50,8 @@ function ItemForm({
   onCancel,
   submitLabel,
   saving,
+  addToInventory,
+  onAddToInventoryChange,
 }: {
   form: FormState
   onChange: (f: FormState) => void
@@ -50,8 +59,44 @@ function ItemForm({
   onCancel: () => void
   submitLabel: string
   saving: boolean
+  addToInventory?: boolean
+  onAddToInventoryChange?: (v: boolean) => void
 }) {
   const [translating, setTranslating] = useState(false)
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [highlightedIndex, setHighlightedIndex] = useState(-1)
+
+  const suggestions = useMemo(() =>
+    form.ingredient_name_en.length >= 1
+      ? (groceryItems as GroceryItem[])
+          .filter(item => item.name_en.toLowerCase().includes(form.ingredient_name_en.toLowerCase()))
+          .slice(0, 8)
+      : [],
+    [form.ingredient_name_en]
+  )
+
+  function handleSuggestionSelect(item: GroceryItem) {
+    onChange({ ...form, ingredient_name_en: item.name_en, ingredient_name_es: item.name_es, category: item.category })
+    setShowSuggestions(false)
+    setHighlightedIndex(-1)
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!showSuggestions || suggestions.length === 0) return
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setHighlightedIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : 0))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setHighlightedIndex(prev => (prev > 0 ? prev - 1 : suggestions.length - 1))
+    } else if (e.key === 'Enter' && highlightedIndex >= 0) {
+      e.preventDefault()
+      handleSuggestionSelect(suggestions[highlightedIndex])
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false)
+      setHighlightedIndex(-1)
+    }
+  }
 
   async function handleTranslate() {
     const name = form.ingredient_name_en.trim() || form.ingredient_name_es.trim()
@@ -85,7 +130,7 @@ function ItemForm({
       style={{ borderColor: 'var(--casa-border)', backgroundColor: 'var(--casa-surface)' }}
     >
       <div className="grid grid-cols-2 gap-2">
-        <div>
+        <div className="relative">
           <label className="block text-xs font-medium mb-1" style={{ color: 'var(--casa-text-faint)' }}>
             Name (English) *
           </label>
@@ -93,11 +138,36 @@ function ItemForm({
             type="text"
             required
             value={form.ingredient_name_en}
-            onChange={(e) => onChange({ ...form, ingredient_name_en: e.target.value })}
+            onChange={(e) => { onChange({ ...form, ingredient_name_en: e.target.value }); setHighlightedIndex(-1) }}
+            onFocus={() => setShowSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+            onKeyDown={handleKeyDown}
             placeholder="e.g. Olive oil"
             className="w-full px-3 py-1.5 rounded-lg border text-sm outline-none focus:ring-2"
             style={inputStyle}
           />
+          {showSuggestions && suggestions.length > 0 && (
+            <ul
+              className="absolute left-0 right-0 top-full z-50 rounded-lg border overflow-y-auto"
+              style={{ maxHeight: '240px', borderColor: 'var(--casa-border)', backgroundColor: 'var(--casa-surface)' }}
+            >
+              {suggestions.map((item, i) => (
+                <li
+                  key={item.name_en}
+                  onMouseDown={() => handleSuggestionSelect(item)}
+                  className="px-3 py-2 text-sm cursor-pointer flex items-center justify-between"
+                  style={{
+                    color: 'var(--casa-text)',
+                    minHeight: '44px',
+                    backgroundColor: i === highlightedIndex ? 'var(--casa-primary-bg)' : 'transparent',
+                  }}
+                >
+                  <span>{item.name_en}</span>
+                  <span className="text-xs" style={{ color: 'var(--casa-text-muted)' }}>{item.name_es}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
         <div>
           <div className="flex items-center justify-between mb-1">
@@ -169,6 +239,17 @@ function ItemForm({
           </select>
         </div>
       </div>
+      {onAddToInventoryChange && (
+        <label className="flex items-center gap-2 text-sm cursor-pointer" style={{ color: 'var(--casa-text-muted)' }}>
+          <input
+            type="checkbox"
+            checked={addToInventory ?? false}
+            onChange={(e) => onAddToInventoryChange(e.target.checked)}
+            className="rounded"
+          />
+          Also add to inventory
+        </label>
+      )}
       <div className="flex gap-2 pt-1">
         <button
           type="submit"
@@ -195,6 +276,7 @@ export function ShoppingListClient({ listId, items }: Props) {
   const router = useRouter()
   const [showAddForm, setShowAddForm] = useState(false)
   const [addForm, setAddForm] = useState<FormState>(emptyForm)
+  const [addToInventory, setAddToInventory] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState<FormState>(emptyForm)
   const [saving, setSaving] = useState(false)
@@ -223,7 +305,18 @@ export function ShoppingListClient({ listId, items }: Props) {
       setError('Failed to add item. Please try again.')
       return
     }
+    if (addToInventory) {
+      await supabase.from('fridge_staples').insert({
+        item_name_en: addForm.ingredient_name_en.trim(),
+        item_name_es: addForm.ingredient_name_es.trim() || addForm.ingredient_name_en.trim(),
+        quantity: addForm.quantity ? parseFloat(addForm.quantity) || null : null,
+        category: addForm.category,
+        is_active: true,
+        is_staple: false,
+      })
+    }
     setAddForm(emptyForm)
+    setAddToInventory(false)
     setShowAddForm(false)
     router.refresh()
   }
@@ -304,9 +397,11 @@ export function ShoppingListClient({ listId, items }: Props) {
           form={addForm}
           onChange={setAddForm}
           onSubmit={handleAdd}
-          onCancel={() => { setShowAddForm(false); setAddForm(emptyForm) }}
+          onCancel={() => { setShowAddForm(false); setAddForm(emptyForm); setAddToInventory(false) }}
           submitLabel="Add Item"
           saving={saving}
+          addToInventory={addToInventory}
+          onAddToInventoryChange={setAddToInventory}
         />
       ) : (
         <button
