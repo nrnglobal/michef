@@ -34,6 +34,8 @@ async function syncShoppingList(planId: string, supabase: Awaited<ReturnType<typ
     list = newList
   }
 
+  if (!list) return
+
   // Fetch existing items to separate custom/tombstone items from stale recipe items
   const { data: existingItems } = await supabase
     .from('shopping_list_items')
