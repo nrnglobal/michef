@@ -59,11 +59,12 @@ export default function ListaPage() {
 
       setListId(listData.id)
 
-      // 3. Fetch all items
+      // 3. Fetch all items — exclude tombstones (manually removed by client)
       const { data: itemsData } = await supabase
         .from('shopping_list_items')
         .select('*')
         .eq('shopping_list_id', listData.id)
+        .eq('manually_removed', false)
         .order('category')
         .order('ingredient_name_es')
 

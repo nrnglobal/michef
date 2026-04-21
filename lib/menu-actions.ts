@@ -74,8 +74,9 @@ async function syncShoppingList(planId: string, supabase: Awaited<ReturnType<typ
     .filter((item) => !removedNames.has(item.ingredient_name_en.toLowerCase().trim()))
     .map((item) => ({
       shopping_list_id: list.id,
-      ingredient_name_en: item.ingredient_name_en,
-      ingredient_name_es: item.ingredient_name_es,
+      // Normalise names so future tombstone comparisons are consistent
+      ingredient_name_en: item.ingredient_name_en.trim(),
+      ingredient_name_es: item.ingredient_name_es.trim(),
       quantity: item.quantity,
       unit: item.unit,
       category: item.category,
