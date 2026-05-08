@@ -69,13 +69,28 @@ function mergeKey(ingredient: Ingredient): string {
 }
 
 const AUTO_EXCLUDED_PHRASES: string[] = [
-  'olive oil',
-  'salt',
+  // Aromatics & alliums
+  'garlic',
+  'onion',
+
+  // Citrus
+  'lemon',
+
+  // Bakery / staples
+  'flour',
+  'tahini',
+
+  // Pepper variants — bare 'pepper' is in Produce keywords (catches bell pepper)
   'black pepper',
   'white pepper',
   'ground pepper',
   'cayenne pepper',
   'peppercorn',
+  'red pepper flakes',
+
+  // Spices & seasonings
+  'spice',
+  'seasoning',
   'cumin',
   'paprika',
   'oregano',
@@ -84,15 +99,31 @@ const AUTO_EXCLUDED_PHRASES: string[] = [
   'cinnamon',
   'turmeric',
   'coriander',
+  'cardamom',
+  'nutmeg',
+  'fennel',
+  'anise',
+  'cloves',
+  'marjoram',
+  'tarragon',
+  'chives',
+  'saffron',
+  'sumac',
+  'fenugreek',
+  'mustard',
+  'basil',
+  'parsley',
+  'cilantro',
+  'mint',
+  'dill',
+  'ginger',
+  'chili',
+  'curry',
   'bay leaf',
+  'bay leaves',
   'allspice',
   'garlic powder',
   'onion powder',
-  'flour',
-  'spice',
-  'garlic',
-  'onion',
-  'bay leaves',
 ]
 
 const AUTO_EXCLUDED_WHOLE_WORDS: string[] = [
@@ -102,6 +133,11 @@ const AUTO_EXCLUDED_WHOLE_WORDS: string[] = [
   'butter',
   'egg',
   'eggs',
+  // 'oil' — catches olive/coconut/vegetable/sesame/avocado/canola/etc. oil.
+  // Whole-word so "boil", "soil", "oily" don't match.
+  'oil',
+  // 'sage' — whole-word so "sausage" doesn't match.
+  'sage',
 ]
 
 const AUTO_EXCLUSION_EXCEPTIONS: string[] = [
