@@ -80,6 +80,7 @@ const AUTO_EXCLUDED_PHRASES: string[] = [
 
   // Citrus
   'lemon',
+  'lime',
 
   // Bakery / staples
   'flour',
