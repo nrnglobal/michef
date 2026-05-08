@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { consolidateIngredients } from '@/lib/consolidate-ingredients'
+import { consolidateIngredients, isAutoExcluded } from '@/lib/consolidate-ingredients'
 import type { Ingredient } from '@/lib/types'
 
 
@@ -71,9 +71,12 @@ async function syncShoppingList(planId: string, supabase: Awaited<ReturnType<typ
     }))
   )
 
-  // Skip any ingredient the user has manually removed
+  // Skip any ingredient the user has manually removed, or any auto-excluded pantry staple
   const newItems = consolidated
-    .filter((item) => !removedNames.has(item.ingredient_name_en.toLowerCase().trim()))
+    .filter((item) =>
+      !removedNames.has(item.ingredient_name_en.toLowerCase().trim()) &&
+      !isAutoExcluded(item.ingredient_name_en)
+    )
     .map((item) => ({
       shopping_list_id: list.id,
       // Normalise names so future tombstone comparisons are consistent

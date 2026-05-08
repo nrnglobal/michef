@@ -68,6 +68,60 @@ function mergeKey(ingredient: Ingredient): string {
   return `${name}|${unit}`
 }
 
+const AUTO_EXCLUDED_PHRASES: string[] = [
+  'olive oil',
+  'salt',
+  'black pepper',
+  'white pepper',
+  'ground pepper',
+  'cayenne pepper',
+  'peppercorn',
+  'cumin',
+  'paprika',
+  'oregano',
+  'thyme',
+  'rosemary',
+  'cinnamon',
+  'turmeric',
+  'coriander',
+  'bay leaf',
+  'allspice',
+  'garlic powder',
+  'onion powder',
+  'flour',
+  'spice',
+  'garlic',
+  'onion',
+  'bay leaves',
+]
+
+const AUTO_EXCLUDED_WHOLE_WORDS: string[] = [
+  'water',
+  'rice',
+  'honey',
+  'butter',
+  'egg',
+  'eggs',
+]
+
+const AUTO_EXCLUSION_EXCEPTIONS: string[] = [
+  'peanut butter',
+  'almond butter',
+  'cashew butter',
+  'sunflower butter',
+  'apple butter',
+  'cookie butter',
+]
+
+export function isAutoExcluded(nameEn: string): boolean {
+  const lower = nameEn.toLowerCase()
+  if (AUTO_EXCLUSION_EXCEPTIONS.some(e => lower.includes(e))) return false
+  if (AUTO_EXCLUDED_PHRASES.some(p => lower.includes(p))) return true
+  return AUTO_EXCLUDED_WHOLE_WORDS.some(
+    w => new RegExp(`\\b${w}\\b`, 'i').test(nameEn)
+  )
+}
+
 export function consolidateIngredients(
   recipes: Array<{ id: string; ingredients: Ingredient[] }>
 ): ConsolidatedItem[] {
