@@ -375,11 +375,13 @@ export function ShoppingListClient({ listId, items }: Props) {
     router.refresh()
   }
 
-  // Group items by category
-  const categoryGroups = items.reduce<Record<string, ShoppingListItem[]>>((acc, item) => {
-    const cat = item.category ?? 'Other'
-    if (!acc[cat]) acc[cat] = []
-    acc[cat].push(item)
+  // Group items by category — case-insensitive so "Spices", "spices", and "SPICES"
+  // collapse to one section. Display label uses the first item's casing.
+  const categoryGroups = items.reduce<Record<string, { label: string; items: ShoppingListItem[] }>>((acc, item) => {
+    const raw = item.category ?? 'Other'
+    const key = raw.toLowerCase().trim()
+    if (!acc[key]) acc[key] = { label: raw, items: [] }
+    acc[key].items.push(item)
     return acc
   }, {})
 
@@ -421,10 +423,10 @@ export function ShoppingListClient({ listId, items }: Props) {
             className="text-xs uppercase tracking-wide font-medium py-1.5 border-b mb-1"
             style={{ color: 'var(--casa-text-faint)', borderColor: 'var(--casa-border)' }}
           >
-            {cat}
+            {categoryGroups[cat].label}
           </p>
           <ul className="space-y-0.5">
-            {categoryGroups[cat].map((item) =>
+            {categoryGroups[cat].items.map((item) =>
               editingId === item.id ? (
                 <li key={`edit-${item.id}`} className="py-1">
                   <ItemForm

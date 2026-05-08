@@ -7,8 +7,13 @@ const CATEGORY_KEYWORDS: Record<string, string[]> = {
     'carrot', 'celery', 'zucchini', 'mushroom', 'date', 'apple', 'banana',
     'ginger', 'scallion', 'green onion', 'cabbage', 'corn', 'potato',
   ],
+  Seafood: [
+    'shrimp', 'prawn', 'salmon', 'tuna', 'fish', 'cod', 'tilapia', 'halibut',
+    'crab', 'lobster', 'scallop', 'mussel', 'clam', 'oyster', 'sardine',
+    'anchovy', 'sea bass', 'mahi', 'trout', 'snapper', 'squid', 'octopus',
+  ],
   Protein: [
-    'chicken', 'beef', 'pork', 'shrimp', 'salmon', 'tuna', 'turkey', 'egg',
+    'chicken', 'beef', 'pork', 'turkey', 'egg', 'sausage', 'bacon', 'ham',
     'tofu', 'tempeh', 'lentil', 'bean', 'chickpea', 'almond butter', 'peanut butter',
   ],
   Dairy: [
@@ -79,6 +84,9 @@ const AUTO_EXCLUDED_PHRASES: string[] = [
   // Bakery / staples
   'flour',
   'tahini',
+
+  // Salt (any kind: sea salt, kosher salt, table salt, etc.)
+  'salt',
 
   // Pepper variants — bare 'pepper' is in Produce keywords (catches bell pepper)
   'black pepper',
@@ -185,7 +193,7 @@ export function consolidateIngredients(
           ingredient_name_es: ingredient.name_es,
           quantity: isNaN(qty) ? null : qty,
           unit: normalizedUnit === '' ? null : normalizedUnit,
-          category: ingredient.category ?? inferCategory(ingredient.name_en),
+          category: inferCategory(ingredient.name_en),
           source_recipe_ids: [recipe.id],
         })
       }
